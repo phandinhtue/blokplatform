@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BloxCorp - メタバース運営シミュレーター</title>
+  <title>BloxCorp CEO Console</title>
   <style>
     :root {
       --bg-main: #0b0f19;
@@ -41,6 +41,7 @@
       padding: 0 16px;
     }
 
+    /* 上部ティッカー */
     .ticker-bar {
       background: #060911;
       border-bottom: 1px solid var(--border-color);
@@ -69,6 +70,7 @@
     .up { color: var(--accent-green); }
     .down { color: var(--accent-red); }
 
+    /* 速報バー */
     .news-bar {
       background: rgba(239, 68, 68, 0.15);
       border-bottom: 1px solid rgba(239, 68, 68, 0.3);
@@ -84,6 +86,7 @@
       border-radius: 3px;
     }
 
+    /* ヘッダー */
     header {
       padding: 20px 0;
       border-bottom: 1px solid var(--border-color);
@@ -137,6 +140,7 @@
       color: var(--accent-blue);
     }
 
+    /* カード・パネル */
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -160,6 +164,7 @@
       gap: 6px;
     }
 
+    /* ステータスグリッド */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -177,6 +182,7 @@
       margin-top: 2px;
     }
 
+    /* 2カラムレイアウト */
     .main-grid {
       display: grid;
       grid-template-columns: 2fr 1fr;
@@ -187,6 +193,7 @@
       .main-grid { grid-template-columns: 1fr; }
     }
 
+    /* タブ切り替えボタン */
     .tab-btn {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid transparent;
@@ -202,6 +209,7 @@
       font-weight: bold;
     }
 
+    /* チャート */
     .canvas-wrap {
       width: 100%;
       height: 240px;
@@ -234,6 +242,7 @@
       border-radius: 50%;
     }
 
+    /* リストフィード */
     .feed-box {
       height: 240px;
       overflow-y: auto;
@@ -252,6 +261,7 @@
       align-items: center;
     }
 
+    /* CEOコマンドボタン */
     .commands-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -281,6 +291,7 @@
       margin-top: 3px;
     }
 
+    /* サーバーマップ */
     .server-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -537,7 +548,7 @@
       plotLine('rostem', maxRostem, '#10b981');
     }
 
-    // 初回実行
+    // 初回初期化
     resizeCanvas();
     for (let i = 0; i < 5; i++) {
       state.history.push({ ccu: state.ccu, rate: state.robuxRate, rostem: state.rostemVal });
@@ -627,7 +638,7 @@
       const f = document.getElementById("devex-feed");
       const itm = document.createElement("div");
       itm.className = "feed-item";
-      itm.innerHTML = `<div><strong>${d}</strong> がDevEx申請</div><div style="color:var(--accent-red);">-R$ ${r.toLocaleString()}</div>`;
+      itm.innerHTML = `<div><strong>${d}</strong> がDevEx申請</div><div style="color:var(--accent-red); font-weight:bold;">-R$ ${r.toLocaleString()}</div>`;
       f.prepend(itm);
       if (f.children.length > 15) f.lastChild.remove();
     }, 4500);
@@ -638,7 +649,7 @@
       const f = document.getElementById("plus-feed");
       const itm = document.createElement("div");
       itm.className = "feed-item";
-      itm.innerHTML = `<div>👑 <strong>${u}</strong> がPlus加入</div><div style="color:var(--accent-green);">+$5.00</div>`;
+      itm.innerHTML = `<div>👑 <strong>${u}</strong> がPlus加入</div><div style="color:var(--accent-green); font-weight:bold;">+$5.00</div>`;
       f.prepend(itm);
       if (f.children.length > 15) f.lastChild.remove();
       state.robux += 350;
@@ -654,7 +665,7 @@
       const f = document.getElementById("trans-feed");
       const itm = document.createElement("div");
       itm.className = "feed-item";
-      itm.innerHTML = `<div>🛍️ <strong>${u}</strong> が購入: ${item}</div><div style="color:var(--accent-gold);">+R$ ${r}</div>`;
+      itm.innerHTML = `<div>🛍️ <strong>${u}</strong> が購入: ${item}</div><div style="color:var(--accent-gold); font-weight:bold;">+R$ ${r}</div>`;
       f.prepend(itm);
       if (f.children.length > 15) f.lastChild.remove();
       state.robux += r;
