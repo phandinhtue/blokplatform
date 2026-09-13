@@ -1,1697 +1,397 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BLOXCORP HQ - プラットフォーム創業者シミュレーター (2006-2035+)</title>
-  <style>
-    :root {
-      --bg-base: #060911;
-      --bg-card: rgba(15, 23, 42, 0.88);
-      --bg-card-hover: rgba(30, 41, 59, 0.85);
-      --border-color: #1e293b;
-      --border-glow: rgba(56, 189, 248, 0.25);
-      --cyan: #06b6d4;
-      --cyan-glow: #22d3ee;
-      --amber: #f59e0b;
-      --yellow: #facc15;
-      --emerald: #10b981;
-      --rose: #f43f5e;
-      --red: #ef4444;
-      --purple: #a855f7;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-    }
-
-    body {
-      background-color: var(--bg-base);
-      color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-      line-height: 1.45;
-      padding-bottom: 50px;
-    }
-
-    /* Scrollbars */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #0b1120; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #475569; }
-
-    /* Layout Containers */
-    .container {
-      max-width: 1320px;
-      margin: 0 auto;
-      padding: 0 16px;
-    }
-
-    /* Glass Panels */
-    .panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 16px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-      position: relative;
-      transition: border-color 0.25s ease, transform 0.2s ease;
-    }
-
-    /* Stock Ticker Bar */
-    .ticker-bar {
-      background: #020617;
-      border-bottom: 1px solid #1e293b;
-      padding: 6px 16px;
-      font-size: 11px;
-      font-family: "JetBrains Mono", Consolas, monospace;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      overflow-x: auto;
-      gap: 16px;
-      white-space: nowrap;
-    }
-    .ticker-items {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-    .stock-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 2px 8px;
-      border-radius: 6px;
-      background: rgba(30, 41, 59, 0.4);
-      border: 1px solid rgba(51, 65, 85, 0.5);
-    }
-    .stock-chip.yoogle {
-      background: rgba(245, 158, 11, 0.12);
-      border-color: rgba(245, 158, 11, 0.4);
-      color: #fbbf24;
-      font-weight: bold;
-    }
-
-    /* Header */
-    header {
-      background: rgba(11, 17, 32, 0.95);
-      border-bottom: 1px solid var(--border-color);
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      backdrop-filter: blur(16px);
-      padding: 10px 0;
-    }
-    .header-inner {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .logo-area {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .logo-cube {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #e11d48, #f59e0b);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 20px;
-      color: white;
-      box-shadow: 0 0 20px rgba(225, 29, 72, 0.4);
-    }
-    .brand-title {
-      font-size: 18px;
-      font-weight: 900;
-      letter-spacing: -0.5px;
-    }
-    .badge {
-      font-size: 10px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 6px;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .badge-diff {
-      background: rgba(6, 182, 212, 0.15);
-      color: var(--cyan);
-      border: 1px solid rgba(6, 182, 212, 0.35);
-    }
-
-    /* Controls & Date */
-    .time-control-box {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #020617;
-      border: 1px solid #1e293b;
-      padding: 6px 14px;
-      border-radius: 12px;
-    }
-    .date-text {
-      font-family: monospace;
-      font-size: 16px;
-      font-weight: 900;
-      color: var(--cyan-glow);
-    }
-
-    .btn-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn {
-      background: #1e293b;
-      color: #cbd5e1;
-      border: 1px solid #334155;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .btn:hover {
-      background: #334155;
-      color: #fff;
-    }
-    .btn:active {
-      transform: scale(0.96);
-    }
-    .btn-primary {
-      background: #e11d48;
-      border-color: #f43f5e;
-      color: white;
-      box-shadow: 0 0 15px rgba(225, 29, 72, 0.35);
-    }
-    .btn-primary:hover {
-      background: #be123c;
-    }
-
-    /* Breaking News Marquee */
-    .news-marquee-wrap {
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      height: 32px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-    .news-tag {
-      background: #e11d48;
-      color: white;
-      font-weight: 900;
-      font-size: 10px;
-      padding: 0 12px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      letter-spacing: 0.5px;
-      flex-shrink: 0;
-    }
-    .news-scroll {
-      flex: 1;
-      overflow: hidden;
-      white-space: nowrap;
-      padding: 0 12px;
-      font-size: 12px;
-      color: #cbd5e1;
-    }
-    .ticker-content {
-      display: inline-block;
-      animation: marquee 28s linear infinite;
-    }
-    @keyframes marquee {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
-    }
-
-    /* Lore Banner */
-    .lore-banner {
-      background: #090e1a;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 8px 14px;
-      margin-top: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 11px;
-      gap: 10px;
-    }
-
-    /* KPI Grid */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-      margin-top: 14px;
-    }
-    .kpi-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      padding: 14px;
-    }
-    .kpi-title {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .kpi-num {
-      font-size: 26px;
-      font-weight: 900;
-      font-family: monospace;
-      margin-top: 4px;
-      letter-spacing: -0.5px;
-    }
-    .kpi-num.cyan { color: var(--cyan); }
-    .kpi-num.yellow { color: var(--yellow); }
-    .kpi-num.emerald { color: var(--emerald); }
-    .kpi-num.rose { color: var(--rose); }
-    .kpi-sub {
-      font-size: 10px;
-      color: var(--text-dim);
-      margin-top: 4px;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    /* Main Content Layout */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 16px;
-      margin-top: 16px;
-    }
-    @media (max-width: 960px) {
-      .main-grid { grid-template-columns: 1fr; }
-    }
-
-    /* Games Cards */
-    .games-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 12px;
-      margin-top: 12px;
-    }
-    .game-box {
-      background: rgba(11, 17, 32, 0.75);
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 12px;
-      transition: border-color 0.2s;
-    }
-    .game-box:hover {
-      border-color: #334155;
-    }
-    .game-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-    .game-title {
-      font-size: 13px;
-      font-weight: 800;
-      margin-top: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .game-stats {
-      margin-top: 8px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      font-family: monospace;
-    }
-    .progress-track {
-      background: #1e293b;
-      border-radius: 6px;
-      height: 5px;
-      overflow: hidden;
-      margin-top: 6px;
-    }
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--cyan), var(--emerald));
-      border-radius: 6px;
-      transition: width 0.3s;
-    }
-
-    /* CEO Policy Deck */
-    .policy-box {
-      margin-top: 16px;
-      border-top: 1px solid #1e293b;
-      padding-top: 14px;
-    }
-    .policy-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .policy-card {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 10px;
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.2s;
-    }
-    .policy-card:hover {
-      background: #1e293b;
-      border-color: #38bdf8;
-    }
-    .policy-card:active {
-      transform: scale(0.98);
-    }
-    .policy-title {
-      font-size: 11px;
-      font-weight: 800;
-      color: #f1f5f9;
-    }
-    .policy-desc {
-      font-size: 9px;
-      color: var(--text-muted);
-      margin-top: 3px;
-    }
-
-    /* Feeds (News & Forums) */
-    .feed-container {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 220px;
-      overflow-y: auto;
-      margin-top: 10px;
-      padding-right: 4px;
-    }
-    .feed-item {
-      background: rgba(2, 6, 23, 0.7);
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 8px 10px;
-      font-size: 11px;
-      line-height: 1.4;
-    }
-
-    /* Chart Section */
-    .chart-section {
-      display: grid;
-      grid-template-columns: 7fr 5fr;
-      gap: 16px;
-      margin-top: 16px;
-    }
-    @media (max-width: 960px) {
-      .chart-section { grid-template-columns: 1fr; }
-    }
-    .chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .tab-group {
-      display: flex;
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 2px;
-    }
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .tab-btn.active {
-      background: #e11d48;
-      color: white;
-    }
-    .canvas-wrap {
-      width: 100%;
-      height: 280px;
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      position: relative;
-    }
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    /* DevEx & Plus Feeds */
-    .stream-panel {
-      height: 140px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 8px;
-      padding-right: 4px;
-    }
-    .stream-card {
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 6px 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 10px;
-      font-family: monospace;
-    }
-
-    /* World Server Map Grid */
-    .server-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .server-node {
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    /* Difficulty Modal */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .modal-card {
-      background: #0b1329;
-      border: 1px solid #334155;
-      border-radius: 20px;
-      max-width: 860px;
-      width: 100%;
-      padding: 24px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    .diff-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-      margin-top: 18px;
-    }
-    .diff-item {
-      background: #020617;
-      border: 2px solid #1e293b;
-      border-radius: 14px;
-      padding: 16px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: all 0.2s;
-    }
-    .diff-item:hover {
-      transform: translateY(-3px);
-      border-color: var(--cyan);
-    }
-
-    /* Toasts */
-    .toast-container {
-      position: fixed;
-      bottom: 16px;
-      right: 16px;
-      z-index: 90;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: none;
-    }
-    .toast {
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 11px;
-      color: #fff;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      transition: all 0.3s;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BloxCorp - メタバース運営シミュレーター</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div id="diff-modal" class="modal-overlay">
-    <div class="modal-card">
-      <div style="text-align: center;">
-        <span class="badge" style="background: rgba(225,29,72,0.2); color: #f43f5e; border: 1px solid rgba(225,29,72,0.4);">
-          META PLATFORM TYCOON
-        </span>
-        <h2 style="font-size: 24px; font-weight: 900; margin-top: 6px;">プラットフォーム経営 難易度選択</h2>
-        <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-          2006年元旦スタート。同接数、DevEx為替圧力、競合「Rostem」、巨大企業「Yoogle」の脅威を乗り越えろ！
-        </p>
-      </div>
-
-      <div class="diff-grid">
-        <!-- Easy -->
-        <div onclick="setDifficulty('easy')" class="diff-item" style="border-color: rgba(16,185,129,0.4);">
-          <div>
-            <div style="font-size: 24px;">🌱</div>
-            <h3 style="font-size: 14px; font-weight: 800; color: #34d399; margin-top: 4px;">初心者向け (神モード)</h3>
-            <p style="font-size: 11px; color: #94a3b8; margin-top: 6px; line-height: 1.4;">
-              何もしなくても同接数が1,000〜数万へ自動爆増！レビュー絶賛、為替も常に高水準でウハウハ経営。
-            </p>
-          </div>
-          <span style="font-size: 10px; font-weight: bold; color: #10b981; margin-top: 10px;">★ 放置で大富豪</span>
-        </div>
-
-        <!-- Normal -->
-        <div onclick="setDifficulty('normal')" class="diff-item" style="border-color: rgba(6,182,212,0.4);">
-          <div>
-            <div style="font-size: 24px;">⚖️</div>
-            <h3 style="font-size: 14px; font-weight: 800; color: #38bdf8; margin-top: 4px;">中級コース (史実体験)</h3>
-            <p style="font-size: 11px; color: #94a3b8; margin-top: 6px; line-height: 1.4;">
-              2011年バズ、2019年炎上、2021年BAN、2026年規制、2030年崩壊の危機をリアルに辿るスタンダード経営。
-            </p>
-          </div>
-          <span style="font-size: 10px; font-weight: bold; color: #38bdf8; margin-top: 10px;">★ 時代の荒波を突破</span>
-        </div>
-
-        <!-- Hard -->
-        <div onclick="setDifficulty('hard')" class="diff-item" style="border-color: rgba(245,158,11,0.4);">
-          <div>
-            <div style="font-size: 24px;">💥</div>
-            <h3 style="font-size: 14px; font-weight: 800; color: #fbbf24; margin-top: 4px;">難しい (即崩壊・脆弱)</h3>
-            <p style="font-size: 11px; color: #94a3b8; margin-top: 6px; line-height: 1.4;">
-              世界サーバーが頻繁に過負荷で落ち、同接がすぐ激減してグラフが真っ赤に！DevEx為替下落も強烈。
-            </p>
-          </div>
-          <span style="font-size: 10px; font-weight: bold; color: #fbbf24; margin-top: 10px;">★ 鯖落ち＆過疎の崖</span>
-        </div>
-
-        <!-- Nightmare -->
-        <div onclick="setDifficulty('nightmare')" class="diff-item" style="border-color: rgba(239,68,68,0.5); background: rgba(239,68,68,0.06);">
-          <div>
-            <div style="font-size: 24px;">💀🔥</div>
-            <h3 style="font-size: 14px; font-weight: 900; color: #f87171; margin-top: 4px;">超難しい (Gemini地獄)</h3>
-            <p style="font-size: 11px; color: #cbd5e1; margin-top: 6px; line-height: 1.4;">
-              借金スタート！Yoogle株高騰でRobux大暴落、Rostemの覇権化、チートDDoSとDevEx流出が同時に襲来！
-            </p>
-          </div>
-          <span style="font-size: 10px; font-weight: 900; color: #ef4444; margin-top: 10px;">★ 倒産確率90%以上</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
+  <!-- 上部ティッカーバー (テック4社) -->
   <div class="ticker-bar">
-    <div style="display: flex; align-items: center; gap: 6px; color: #94a3b8;">
-      <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
-      <b>GLOBAL TECH STOCKS:</b>
-    </div>
-    <div class="ticker-items">
-      <div class="stock-chip">
-        <span>plddc:</span>
-        <b id="stk-plddc" style="color: #f8fafc;">$142.30</b>
-        <span id="stk-plddc-d" style="color: #34d399;">+0.8%</span>
+    <div class="container ticker-content">
+      <div class="ticker-group">
+        <span style="color: var(--text-sub);">NASDAQ GLOBAL:</span>
+        <div class="stock-item">plddc <span id="ticker-plddc" class="up">$142.30</span></div>
+        <div class="stock-item">DKK4 <span id="ticker-dkk4" class="up">$88.15</span></div>
+        <div class="stock-item">Yoogle <span id="ticker-yoogle" class="down">$210.40</span></div>
+        <div class="stock-item">mincrosft <span id="ticker-mincrosft" class="up">$380.00</span></div>
       </div>
-      <div class="stock-chip">
-        <span>DKK4:</span>
-        <b id="stk-dkk4" style="color: #f8fafc;">$89.15</b>
-        <span id="stk-dkk4-d" style="color: #f87171;">-0.4%</span>
-      </div>
-      <!-- Key Mechanic: Yoogle goes up -> Robux JPY drops -->
-      <div class="stock-chip yoogle">
-        <span>Yoogle:</span>
-        <b id="stk-yoogle">$275.40</b>
-        <span id="stk-yoogle-d" style="color: #34d399;">+2.3% ▲</span>
-        <small style="color: #f59e0b; font-size: 9px;">(高騰時Robux価値急落!)</small>
-      </div>
-      <div class="stock-chip">
-        <span>mincrosft:</span>
-        <b id="stk-mincrosft" style="color: #f8fafc;">$310.80</b>
-        <span id="stk-mincrosft-d" style="color: #34d399;">+1.1%</span>
+      <div style="color: #f59e0b; font-size: 11px;">
+        ⚠️ Yoogle高騰時: Robux為替下落アラート連動中
       </div>
     </div>
-    <div style="color: #64748b; font-size: 10px;">NASDAQ AUTO FEED</div>
   </div>
 
-  <header>
-    <div class="container header-inner">
-      <div class="logo-area">
-        <div class="logo-cube">B</div>
-        <div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="brand-title">BLOXCORP <span style="color: #e11d48; font-size: 12px;">HQ</span></span>
-            <span id="diff-badge" class="badge badge-diff">NORMAL</span>
+  <!-- 速報ニュースバー -->
+  <div class="news-bar">
+    <div class="container" style="display:flex; align-items:center; gap:8px;">
+      <span class="news-badge">BREAKING</span>
+      <span id="news-text" style="color:#e5e7eb; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+        2006年1月1日: ブロック型オンライン物理サンドボックス「BloxCorp」正式サービス開始！
+      </span>
+    </div>
+  </div>
+
+  <div class="container" style="margin-top: 16px;">
+    <!-- ヘッダー -->
+    <header>
+      <div class="header-row">
+        <div class="logo-title">
+          <div class="logo-icon">
+            <div class="logo-inner"></div>
           </div>
-          <p style="font-size: 10px; color: var(--text-muted);">メタバース・ゲームプラットフォーム統括システム</p>
-        </div>
-      </div>
-
-      <!-- Calendar Box -->
-      <div class="time-control-box">
-        <div style="text-align: center;">
-          <div style="font-size: 9px; color: var(--text-dim); font-weight: bold;">TIMELINE</div>
-          <div id="date-display" class="date-text">2006/01/01</div>
-        </div>
-      </div>
-
-      <!-- Treasury & FX -->
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <div style="background: rgba(30,41,59,0.5); border: 1px solid #334155; padding: 4px 10px; border-radius: 10px;">
-          <div style="font-size: 9px; color: var(--text-muted);">保留 Robux</div>
-          <div id="robux-display" style="font-size: 13px; font-weight: 900; font-family: monospace; color: #facc15;">R$ 1,500</div>
-        </div>
-        <div style="background: rgba(30,41,59,0.5); border: 1px solid rgba(245,158,11,0.4); padding: 4px 10px; border-radius: 10px;">
-          <div style="font-size: 9px; color: var(--text-muted);">Robux円相場 (1 R$)</div>
-          <div id="fx-display" style="font-size: 13px; font-weight: 900; font-family: monospace; color: #f59e0b;">¥1.85</div>
-        </div>
-        <div class="btn-group">
-          <button id="btn-pause" onclick="togglePause()" class="btn">一時停止</button>
-          <button id="btn-speed" onclick="cycleSpeed()" class="btn">1x</button>
-          <button onclick="openDiffModal()" class="btn">難易度</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- News Marquee -->
-    <div class="container">
-      <div class="news-marquee-wrap">
-        <div class="news-tag">BREAKING</div>
-        <div class="news-scroll">
-          <span id="marquee-text" class="ticker-content">
-            2006年元旦：BLOXCORP創業！物理ブロックサンドボックスのαテストが静かに開始されました。
-          </span>
-        </div>
-      </div>
-
-      <div class="lore-banner">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span id="era-badge" class="badge" style="background: #1e293b; color: #94a3b8; border: 1px solid #334155;">
-            2006 創成期
-          </span>
-          <span id="era-desc" style="color: #cbd5e1;">ブロックサンドボックスの実験が始まりました。まだユーザーは少数ですが熱心なファンが集まっています。</span>
-        </div>
-        <span id="era-year" style="font-family: monospace; font-size: 10px; color: var(--text-dim);">ERA 1</span>
-      </div>
-    </div>
-  </header>
-
-  <main class="container">
-    <div class="kpi-grid">
-      <!-- CCU -->
-      <div class="kpi-card">
-        <div class="kpi-title">
-          <span>プラットフォーム同接 (CCU)</span>
-          <span id="ccu-badge" class="badge" style="background: rgba(6,182,212,0.2); color: var(--cyan);">LIVE</span>
-        </div>
-        <div id="kpi-ccu" class="kpi-num cyan">120</div>
-        <div class="kpi-sub">
-          <span>最高同接: <b id="kpi-peak-ccu" style="color: #f8fafc;">120</b></span>
-          <span id="ccu-health-text" style="color: var(--cyan);">安定稼働中</span>
-        </div>
-      </div>
-
-      <!-- Visits & Valuation -->
-      <div class="kpi-card">
-        <div class="kpi-title">
-          <span>累計セッション訪問数</span>
-          <span style="font-size: 10px; color: #818cf8;">VISITS</span>
-        </div>
-        <div id="kpi-visits" class="kpi-num" style="color: #c7d2fe;">1,240</div>
-        <div class="kpi-sub">
-          <span>円換算保有資産:</span>
-          <span id="kpi-jpy-total" style="color: #facc15; font-weight: bold; font-family: monospace;">¥0</span>
-        </div>
-      </div>
-
-      <!-- Satisfaction & Subscriptions -->
-      <div class="kpi-card">
-        <div class="kpi-title">
-          <span>クリエイター満足度</span>
-          <span id="kpi-stars" style="color: #fbbf24; font-size: 11px;">★★★★★</span>
-        </div>
-        <div id="kpi-satisfaction" class="kpi-num emerald">92%</div>
-        <div class="kpi-sub">
-          <span>月額$5 Plus契約者:</span>
-          <span id="kpi-plus-subs" style="color: #c084fc; font-weight: bold; font-family: monospace;">128人</span>
-        </div>
-      </div>
-
-      <!-- Rival Rostem -->
-      <div class="kpi-card">
-        <div class="kpi-title">
-          <span>競合「Rostem」企業価値</span>
-          <span class="badge" style="background: rgba(16,185,129,0.15); color: #34d399;">RIVAL</span>
-        </div>
-        <div id="kpi-rostem" class="kpi-num" style="color: #34d399;">15pt</div>
-        <div class="kpi-sub">
-          <span>市場シェア:</span>
-          <span id="kpi-share" style="color: var(--cyan); font-weight: bold; font-family: monospace;">Blox 89%</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="main-grid">
-      <!-- Left: Games & CEO Policies -->
-      <div class="panel">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 8px;">
           <div>
-            <h2 style="font-size: 14px; font-weight: 900;">🔥 トップゲーム（独立クリエイター自律更新中）</h2>
-            <p style="font-size: 11px; color: var(--text-muted);">開発者たちが自動でパッチ配信。CEOは価格設定でRobuxを大量吸い上げ可能！</p>
+            <h1>BloxCorp CEO Console</h1>
+            <div style="font-size:12px; color:var(--text-sub);">グローバル・プラットフォーム運営ダッシュボード</div>
           </div>
-          <span style="font-size: 10px; color: #10b981; font-family: monospace;">● 自動開発稼働</span>
         </div>
-
-        <div id="games-container" class="games-list">
-          <!-- Injected via JS -->
-        </div>
-
-        <!-- CEO Controls -->
-        <div class="policy-box">
-          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: bold;">
-            <span style="color: #94a3b8;">CEO経営戦略指令 (課金価格倍率: <b id="mult-display" style="color: #facc15;">x1.0</b>)</span>
-            <span style="font-size: 10px; color: var(--text-dim);">高価格＝Robux大量獲得 / 満足度低下</span>
-          </div>
-
-          <div class="policy-grid">
-            <div onclick="adjustPricing(1.5)" class="policy-card" style="border-color: rgba(245,158,11,0.4);">
-              <div class="policy-title" style="color: #fbbf24;">課金値上げ (+50%)</div>
-              <div class="policy-desc">大量Robux獲得！ただしプレイヤー不満上昇</div>
-            </div>
-            <div onclick="adjustPricing(0.8)" class="policy-card" style="border-color: rgba(6,182,212,0.4);">
-              <div class="policy-title" style="color: #38bdf8;">課金値下げ (-20%)</div>
-              <div class="policy-desc">ユーザー満足度回復、売上は微減</div>
-            </div>
-            <div onclick="platformAction('server')" class="policy-card">
-              <div class="policy-title" style="color: #34d399;">サーバー増設</div>
-              <div class="policy-desc">過負荷解消 (要 R$ 1,200)</div>
-            </div>
-            <div onclick="platformAction('devfund')" class="policy-card">
-              <div class="policy-title" style="color: #c084fc;">開発助成金</div>
-              <div class="policy-desc">Rostem移籍阻止 (要 R$ 2,500)</div>
-            </div>
-          </div>
+        <div class="date-badge">
+          <div style="font-size:11px; color:var(--text-sub);">PLATFORM DATE</div>
+          <div class="year" id="display-date">2006/01/01</div>
         </div>
       </div>
+    </header>
 
-      <!-- Right: News & Forum Feed -->
-      <div style="display: flex; flex-direction: column; gap: 12px;">
-        <div class="panel">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 6px;">
-            <h3 style="font-size: 12px; font-weight: 800; color: #f87171;">📰 メディア速報＆業界ニュース</h3>
-            <span class="badge" style="background: rgba(239,68,68,0.2); color: #f87171;">LIVE</span>
-          </div>
-          <div id="news-feed" class="feed-container"></div>
-        </div>
-
-        <div class="panel" style="flex: 1;">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 6px;">
-            <h3 style="font-size: 12px; font-weight: 800; color: #38bdf8;">💬 コミュニティ・開発者の声</h3>
-            <span style="font-size: 10px; color: var(--text-dim); font-family: monospace;">FEED</span>
-          </div>
-          <div id="forum-feed" class="feed-container"></div>
-        </div>
+    <!-- 主要指標グリッド -->
+    <div class="stats-grid">
+      <div class="card">
+        <div class="card-title">👥 同時接続数 (CCU)</div>
+        <div class="stat-val" id="stat-ccu" style="color:var(--accent-blue);">120</div>
+        <div class="stat-sub">最高記録: <span id="stat-peak">120</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🪙 Robux為替レート</div>
+        <div class="stat-val" id="stat-rate" style="color:var(--accent-gold);">¥ 1.50</div>
+        <div class="stat-sub">1 R$ あたりの日本円価値</div>
+      </div>
+      <div class="card">
+        <div class="card-title">💰 プラットフォーム資金</div>
+        <div class="stat-val" id="stat-funds" style="color:var(--accent-green);">R$ 5,000</div>
+        <div class="stat-sub">約 <span id="stat-jpy">¥ 7,500</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚔️ 競合「Rostem」時価</div>
+        <div class="stat-val" id="stat-rostem" style="color:#34d399;">$ 12.5M</div>
+        <div class="stat-sub">市場シェア侵食率: <span id="stat-share">4.2%</span></div>
       </div>
     </div>
 
-    <div class="chart-section">
-      <!-- Interactive Multi-line Canvas Chart -->
-      <div class="panel">
-        <div class="chart-header">
-          <div>
-            <h3 style="font-size: 13px; font-weight: 900;">プラットフォーム推移チャート</h3>
-            <div style="display: flex; gap: 12px; font-size: 10px; font-family: monospace; margin-top: 4px;">
-              <span style="color: var(--cyan);">■ 青: 同接 (過疎時:赤!)</span>
-              <span style="color: var(--yellow);">■ 黄: Robux為替 (円)</span>
-              <span style="color: var(--emerald);">■ 緑: ライバル「Rostem」</span>
-            </div>
-          </div>
-
-          <!-- Time Range Tabs -->
-          <div class="tab-group">
-            <button id="tab-1y" onclick="setChartRange('1y')" class="tab-btn">1年</button>
-            <button id="tab-3y" onclick="setChartRange('3y')" class="tab-btn">3年</button>
-            <button id="tab-all" onclick="setChartRange('all')" class="tab-btn active">All (全期間)</button>
-          </div>
-        </div>
-
-        <div class="canvas-wrap">
-          <canvas id="chart-canvas"></canvas>
-          <div id="chart-tooltip" style="position: absolute; top: 8px; left: 8px; font-size: 10px; font-family: monospace; background: rgba(15,23,42,0.85); border: 1px solid #334155; padding: 4px 8px; border-radius: 6px;">
-            データ集計中...
-          </div>
-        </div>
-      </div>
-
-      <!-- DevEx Cashout & $5 Plus Plan Monitors -->
-      <div style="display: flex; flex-direction: column; gap: 12px;">
-        <!-- DevEx Monitor (Devalues Robux!) -->
-        <div class="panel">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 4px;">
-            <h4 style="font-size: 11px; font-weight: 900; color: #f43f5e;">⚡ DevEx (開発者現金換金) 監視</h4>
-            <span class="badge" style="background: rgba(244,63,94,0.15); color: #f43f5e;">為替下落要因</span>
-          </div>
-          <p style="font-size: 9px; color: var(--text-muted); margin-top: 4px;">
-            開発者がRobuxを米ドル換金すると市場に売り圧力がかかり、<b style="color: #facc15;">Robuxの円相場が下落</b>します！
-          </p>
-          <div id="devex-feed" class="stream-panel"></div>
-        </div>
-
-        <!-- Monthly $5 Plus Plan Feed -->
-        <div class="panel">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 4px;">
-            <h4 style="font-size: 11px; font-weight: 900; color: #c084fc;">👑 月額 $5 Plusプラン加入履歴</h4>
-            <span class="badge" style="background: rgba(192,132,252,0.15); color: #c084fc;">VIP CASH</span>
-          </div>
-          <p style="font-size: 9px; color: var(--text-muted); margin-top: 4px;">
-            毎月5ドル(約¥750)を支払うファン層。安定した運営Robuxキャッシュを獲得できます。
-          </p>
-          <div id="plus-feed" class="stream-panel"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="panel" style="margin-top: 16px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid #1e293b; padding-bottom: 8px;">
-        <div>
-          <h3 style="font-size: 13px; font-weight: 900;">🌐 全BloxCorpグローバルサーバー稼働マップ (World Server Network)</h3>
-          <p style="font-size: 10px; color: var(--text-muted);">
-            各大陸拠点のPing・負荷を監視。過負荷になると接続が切断され同接が激減します。
-          </p>
-        </div>
-        <button onclick="rebootServers()" class="btn btn-primary">
-          全サーバー緊急リブート＆負荷分散
+    <!-- CEO アクションボタン -->
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-title">⚡ CEO戦略オペレーション</div>
+      <div class="commands-grid" style="margin-top:10px;">
+        <button class="cmd-btn" onclick="triggerDevExBoost()">
+          <div class="cmd-name">💸 DevEx換金レート引き締め</div>
+          <div class="cmd-desc">換金枠を絞りRobux流出と暴落を防ぐ</div>
+        </button>
+        <button class="cmd-btn" onclick="togglePriceStrategy()">
+          <div class="cmd-name">🏷️ 課金アイテム50%値上げ</div>
+          <div class="cmd-desc">Robux回収率激増 (不満度微増)</div>
+        </button>
+        <button class="cmd-btn" onclick="globalFestival()">
+          <div class="cmd-name">🎪 全社メタバースフェス開催</div>
+          <div class="cmd-desc">同時接続数を一気に引き上げる</div>
+        </button>
+        <button class="cmd-btn" onclick="rebootServers()">
+          <div class="cmd-name">🔄 全地域サーバー一斉リブート</div>
+          <div class="cmd-desc">高負荷・Ping悪化を一瞬でリフレッシュ</div>
         </button>
       </div>
-
-      <div id="server-nodes" class="server-grid"></div>
     </div>
 
-    <div class="panel" style="margin-top: 16px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 6px;">
-        <h3 style="font-size: 12px; font-weight: 900; color: #facc15;">💰 全プレイヤー課金履歴 (LIVE PURCHASES)</h3>
-        <span class="badge" style="background: rgba(250,204,21,0.15); color: #facc15;">REAL-TIME</span>
+    <!-- メインデータグラフ＆各種履歴フィード -->
+    <div class="main-grid">
+      <!-- チャート -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📈 グローバル推移チャート</div>
+          <div class="chart-controls">
+            <button class="tab-btn" onclick="setChartRange('1y')">1年</button>
+            <button class="tab-btn" onclick="setChartRange('3y')">3年</button>
+            <button class="tab-btn active" id="btn-all" onclick="setChartRange('all')">All</button>
+          </div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="mainChart"></canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><span class="legend-dot" style="background:#00d2ff;"></span> 同接数 (青/危機時赤)</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> Robux円相場 (黄)</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> Rostem企業価値 (緑)</div>
+        </div>
       </div>
-      <p style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">
-        自動運営中のゲーム群からリアルタイムにパス購入ログが入金されます（日本円換算付き）。
-      </p>
-      <div id="tx-feed" class="stream-panel" style="height: 120px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));"></div>
+
+      <!-- DevEx引き換えフィード -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📉 DevEx (開発者現金化) 申請所</div>
+          <span style="font-size:11px; color:var(--accent-red);">※換金でRobux下落</span>
+        </div>
+        <div class="feed-box" id="devex-feed"></div>
+      </div>
     </div>
-  </main>
 
-  <div id="toast-shelf" class="toast-container"></div>
+    <!-- Plusプラン & リアルタイム課金履歴 -->
+    <div class="main-grid">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">⭐ 月額 $5「Plusプラン」契約者ログ</div>
+          <span style="font-size:11px; color:#38bdf8;">毎月 $5 入金</span>
+        </div>
+        <div class="feed-box" id="plus-feed"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🛒 リアルタイム課金ログ</div>
+          <span style="font-size:11px; color:var(--text-sub);">ゲームパス・アイテム</span>
+        </div>
+        <div class="feed-box" id="trans-feed"></div>
+      </div>
+    </div>
 
+    <!-- 世界サーバー網リアルタイムマップ -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🌐 世界BloxCorpデータセンター稼働状況</div>
+        <span style="font-size:11px; color:var(--text-sub);">負荷率88%超で障害発生</span>
+      </div>
+      <div class="server-grid" id="server-grid"></div>
+    </div>
+  </div>
+
+  <!-- ゲーム内ロジック -->
   <script>
-    /* Historical Eras Definition (2006 to 2035+) */
-    const HISTORIC_ERAS = [
-      {
-        year: 2006,
-        badge: "2006 創成期",
-        lore: "ブロック物理サンドボックス誕生。自作ゲームがネットの片隅で口コミ拡散。",
-        ccuMult: 1.0,
-        fxJPY: 1.85,
-        rostemGrowth: 5,
-        isBad: false
-      },
-      {
-        year: 2011,
-        badge: "2011 爆発的ブーム到来！",
-        lore: "【歴史的バズ】物理エンジンとLuaスクリプトの進化で口コミ大爆発！世界中の子ども達が一斉流入！",
-        ccuMult: 7.2,
-        fxJPY: 3.8,
-        rostemGrowth: 15,
-        isBad: false
-      },
-      {
-        year: 2019,
-        badge: "2019 ゴミアプデ大炎上",
-        lore: "【運営大失態】UI全面改悪＆音源著作権一斉削除で名作BGMが全滅！ライバルRostemへユーザー脱出！",
-        ccuMult: 0.52,
-        fxJPY: 1.9,
-        rostemGrowth: 45,
-        isBad: true
-      },
-      {
-        year: 2021,
-        badge: "2021 巨大BANウェーブ",
-        lore: "【粛清の嵐】不正ボット・自動ファーミング業者数百万垢を永久追放！見かけの同接が急降下！",
-        ccuMult: 0.65,
-        fxJPY: 2.7,
-        rostemGrowth: 20,
-        isBad: true
-      },
-      {
-        year: 2026,
-        badge: "2026 未成年規制強化の嵐",
-        lore: "【政府監査】年齢確認ゲート必須化＆ガチャ・広告の厳罰化。プラットフォーム収益激震！",
-        ccuMult: 0.8,
-        fxJPY: 2.1,
-        rostemGrowth: 35,
-        isBad: true
-      },
-      {
-        year: 2030,
-        badge: "2030 プラットフォーム崩壊の始まり",
-        lore: "【存亡の危機】競合Rostemの完全台頭と過疎化の崖！クリエイター大量離脱で赤字寸前！",
-        ccuMult: 0.38,
-        fxJPY: 1.05,
-        rostemGrowth: 80,
-        isBad: true
-      }
-    ];
-
-    const NEWS_POOL = [
-      "【速報】小学生の間でブロックスが大流行、学校でプレイ禁止令が発令！",
-      "有名YouTuberが「100のドア」を実況配信！同接が一時的に急上昇！",
-      "ライバル「Rostem」が開発者還元率85%を発表！ブロックスから移籍の動き加速！",
-      "為替市場：円安進行によりRobuxの円換算価値が急変動！換金トレーダー殺到！",
-      "海外コミュニティで「最近のゲームパス高すぎ」と不買運動の兆候！",
-      "新世代VRデバイスへの対応を発表、投資家から買い注文が殺到！",
-      "未成年ユーザーの課金トラブルが大手メディアの特集番組で糾弾される！",
-      "大手ゲームスタジオがBloxCorpと独占提携！新作AAA級タイトルが投入決定！",
-      "サーバーファームで停電発生！一部リージョンで大規模接続障害！",
-      "TikTokで「ペット育成の裏ワザ」動画が3,000万再生を突破！新規流入爆発！",
-      "テック大手Yoogleが次世代AI空間を発表！BloxCorpのシェア脅かす！"
-    ];
-
-    const PLAYERS = [
-      "NoobSlayer99", "Builderman_JP", "Robloxian777", "BloxQueen", "NeonCat",
-      "GamerX", "SpeedyBoy", "BaconMaster", "UgcDesigner", "VipWhale",
-      "PizzaDelivery", "TowerRunner", "BloxPanda", "DarkShadow", "GigaRoblox"
-    ];
-
-    const COUNTRIES = ["🇺🇸 US", "🇯🇵 JP", "🇩🇪 DE", "🇧🇷 BR", "🇬🇧 UK", "🇰🇷 KR", "🇫🇷 FR", "🇦🇺 AU", "🇨🇦 CA"];
-
-    /* Game State Object */
-    let state = {
-      difficulty: 'normal',
-      paused: false,
-      speed: 1,
-      currentDate: new Date(2006, 0, 1),
+    // --- 状態管理 ---
+    const state = {
+      date: new Date(2006, 0, 1),
+      ccu: 150,
+      peakCcu: 150,
+      robux: 50000,
+      robuxRate: 1.50, // 1 R$ = ¥1.50
+      rostemVal: 12.5,
       chartRange: 'all',
-
-      // Economy
-      treasuryRobux: 1500,
-      robuxJpyRate: 1.85,
-      priceMultiplier: 1.0,
-      satisfaction: 92,
-      totalVisits: 1800,
-      rostemValue: 15,
-      plusSubscribers: 128,
-
-      // Stocks
-      stocks: {
-        plddc: 142.30,
-        plddcDiff: 0.8,
-        dkk4: 89.15,
-        dkk4Diff: -0.4,
-        yoogle: 275.40,
-        yoogleDiff: 2.3,
-        mincrosft: 310.80,
-        mincrosftDiff: 1.1
-      },
-
-      // World Servers
-      servers: [
-        { id: "us_east", name: "北米東部 (バージニア)", ping: 22, load: 45, status: "ONLINE" },
-        { id: "us_west", name: "北米西部 (カリフォルニア)", ping: 35, load: 50, status: "ONLINE" },
-        { id: "eu_central", name: "欧州中央 (フランクフルト)", ping: 40, load: 52, status: "ONLINE" },
-        { id: "ap_tokyo", name: "東アジア (東京・ソウル)", ping: 16, load: 58, status: "ONLINE" },
-        { id: "sa_brazil", name: "南米 (サンパウロ)", ping: 85, load: 38, status: "ONLINE" },
-        { id: "oc_sydney", name: "オセアニア (シドニー)", ping: 92, load: 26, status: "ONLINE" }
-      ],
-
-      // Autonomous Games
-      games: [
-        { id: "pet_sim", name: "ペット育成＆トレードワールド", genre: "Simulator", creator: "PetStudio_HQ", ccu: 55, peakCcu: 55, basePrice: 180, currentPrice: 180, passName: "VIPペットパス", progress: 80 },
-        { id: "sea_pirates", name: "海賊フルーツ大冒険 (Pirate Piece)", genre: "Action RPG", creator: "AnimeGamerz", ccu: 40, peakCcu: 40, basePrice: 400, currentPrice: 400, passName: "幻の悪魔の実", progress: 45 },
-        { id: "horror_doors", name: "100のドアからの脱出 (Doors)", genre: "Horror", creator: "ShadowCraft", ccu: 25, peakCcu: 25, basePrice: 120, currentPrice: 120, passName: "復活十字架", progress: 20 },
-        { id: "brook_life", name: "ブロックスビル・タウン生活", genre: "RP", creator: "WolfPaq_Fan", ccu: 20, peakCcu: 20, basePrice: 280, currentPrice: 280, passName: "スーパーカー＆豪邸", progress: 60 },
-        { id: "obby_hell", name: "地獄のアスレチックタワー", genre: "Obby", creator: "ObbyKing99", ccu: 15, peakCcu: 15, basePrice: 70, currentPrice: 70, passName: "重力半減コイル", progress: 35 }
-      ],
-
       history: [],
-      triggeredEras: new Set()
+      stocks: { plddc: 142.3, dkk4: 88.1, yoogle: 210.4, mincrosft: 380.0 },
+      servers: [
+        { name: "US-East (バージニア)", ping: 24, load: 35, status: "ok" },
+        { name: "US-West (オレゴン)", ping: 38, load: 42, status: "ok" },
+        { name: "EU-Central (フランクフルト)", ping: 85, load: 50, status: "ok" },
+        { name: "Asia-East (東京)", ping: 15, load: 28, status: "ok" },
+        { name: "SA-East (サンパウロ)", ping: 140, load: 60, status: "ok" }
+      ]
     };
 
-    /* Difficulty Setting */
-    function openDiffModal() {
-      document.getElementById('diff-modal').style.display = 'flex';
+    // チャート描画
+    const canvas = document.getElementById("mainChart");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
     }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
 
-    function setDifficulty(diff) {
-      state.difficulty = diff;
-      document.getElementById('diff-modal').style.display = 'none';
-
-      const badge = document.getElementById('diff-badge');
-      if (diff === 'easy') {
-        badge.innerText = 'EASY (神モード)';
-        badge.style.color = '#34d399';
-        state.treasuryRobux = 30000;
-        state.satisfaction = 99;
-        state.robuxJpyRate = 3.5;
-        state.rostemValue = 5;
-        state.plusSubscribers = 500;
-      } else if (diff === 'normal') {
-        badge.innerText = 'NORMAL (史実)';
-        badge.style.color = '#38bdf8';
-        state.treasuryRobux = 1500;
-        state.satisfaction = 90;
-        state.robuxJpyRate = 1.85;
-        state.rostemValue = 15;
-      } else if (diff === 'hard') {
-        badge.innerText = 'HARD (即過疎)';
-        badge.style.color = '#fbbf24';
-        state.treasuryRobux = 500;
-        state.satisfaction = 75;
-        state.robuxJpyRate = 1.2;
-        state.rostemValue = 30;
-      } else if (diff === 'nightmare') {
-        badge.innerText = 'NIGHTMARE (地獄)';
-        badge.style.color = '#f87171';
-        state.treasuryRobux = -500; // Debt start!
-        state.satisfaction = 50;
-        state.robuxJpyRate = 0.85;
-        state.rostemValue = 55;
-      }
-
-      state.currentDate = new Date(2006, 0, 1);
-      state.history = [];
-      state.triggeredEras.clear();
-
-      const mult = diff === 'easy' ? 40 : 1;
-      state.games.forEach((g, i) => {
-        g.ccu = Math.floor((65 - i * 10) * mult);
-        g.peakCcu = g.ccu;
-      });
-
-      pushNews("BLOXCORPが正式登記されました。ブロックで遊ぶメタバースの歴史が幕を開けます！");
-      pushForum("Gamer001", "新しいゲームプラットフォーム見つけた！レゴみたいで面白い！");
-      notify(`難易度「${badge.innerText}」でゲームを開始しました`);
-    }
-
-    /* Controls */
-    function togglePause() {
-      state.paused = !state.paused;
-      document.getElementById('btn-pause').innerText = state.paused ? "再開" : "一時停止";
-      notify(state.paused ? "⏸️ 一時停止しました" : "▶️ 再開しました");
-    }
-
-    function cycleSpeed() {
-      const speeds = [1, 2, 5, 10];
-      const idx = speeds.indexOf(state.speed);
-      state.speed = speeds[(idx + 1) % speeds.length];
-      document.getElementById('btn-speed').innerText = `${state.speed}x`;
-      notify(`⏩ 速度: ${state.speed}x`);
-    }
-
-    function setChartRange(range) {
-      state.chartRange = range;
-      ['1y', '3y', 'all'].forEach(r => {
-        const btn = document.getElementById(`tab-${r}`);
-        if (r === range) btn.classList.add('active');
-        else btn.classList.remove('active');
-      });
-      renderChart();
-    }
-
-    function adjustPricing(factor) {
-      state.priceMultiplier = Math.max(0.4, Math.min(4.0, +(state.priceMultiplier * factor).toFixed(2)));
-      document.getElementById('mult-display').innerText = `x${state.priceMultiplier.toFixed(1)}`;
-      state.games.forEach(g => {
-        g.currentPrice = Math.max(10, Math.round(g.basePrice * state.priceMultiplier));
-      });
-
-      if (factor > 1) {
-        state.satisfaction = Math.max(15, state.satisfaction - 8);
-        notify("💰 パス値上げ！獲得Robux急増＆満足度低下", "warning");
-        pushForum("AngryNoob", "また値上げかよ！課金ゲーになりすぎ！");
-      } else {
-        state.satisfaction = Math.min(100, state.satisfaction + 6);
-        notify("🏷️ パス値下げ！プレイヤー歓喜＆満足度上昇", "success");
-        pushForum("HappyGamer", "パス安くなって神！課金したわ！");
-      }
-      renderUI();
-    }
-
-    function platformAction(type) {
-      if (type === 'server') {
-        if (state.treasuryRobux < 1200) return notify("資金不足 (要 R$ 1,200)", "error");
-        state.treasuryRobux -= 1200;
-        state.servers.forEach(s => { s.load = Math.max(15, s.load - 30); s.status = "ONLINE"; });
-        state.satisfaction = Math.min(100, state.satisfaction + 8);
-        notify("🌐 全世界サーバー増強！過負荷解消＆同接安定！", "success");
-      } else if (type === 'devfund') {
-        if (state.treasuryRobux < 2500) return notify("資金不足 (要 R$ 2,500)", "error");
-        state.treasuryRobux -= 2500;
-        state.games.forEach(g => { g.progress += 40; });
-        state.rostemValue = Math.max(5, state.rostemValue - 15);
-        notify("💎 クリエイター基金創設！Rostem移籍を完全阻止！", "success");
-      }
-      renderUI();
-    }
-
-    function rebootServers() {
-      state.servers.forEach(s => {
-        s.load = Math.floor(Math.random() * 20 + 20);
-        s.ping = Math.floor(Math.random() * 20 + 15);
-        s.status = "ONLINE";
-      });
-      state.satisfaction = Math.min(100, state.satisfaction + 5);
-      notify("🚀 全地域サーバーの一斉リブート完了！", "success");
-      renderServers();
-    }
-
-    /* Feeds & Notifications */
-    function notify(text, type = "info") {
-      const shelf = document.getElementById('toast-shelf');
-      const el = document.createElement('div');
-      el.className = 'toast';
-      if (type === 'success') el.style.borderColor = '#10b981';
-      if (type === 'warning') el.style.borderColor = '#f59e0b';
-      if (type === 'error') el.style.borderColor = '#ef4444';
-      el.innerText = text;
-      shelf.appendChild(el);
-      setTimeout(() => {
-        el.style.opacity = '0';
-        setTimeout(() => el.remove(), 300);
-      }, 3000);
-    }
-
-    function pushNews(headline) {
-      document.getElementById('marquee-text').innerText = headline;
-      const feed = document.getElementById('news-feed');
-      const el = document.createElement('div');
-      el.className = 'feed-item';
-      el.innerHTML = `<span style="color:#64748b; font-family:monospace;">${formatDate(state.currentDate)}</span> <b style="color:#f87171;">[速報]</b> ${headline}`;
-      feed.prepend(el);
-      while (feed.children.length > 20) feed.removeChild(feed.lastChild);
-    }
-
-    function pushForum(user, msg) {
-      const feed = document.getElementById('forum-feed');
-      const el = document.createElement('div');
-      el.className = 'feed-item';
-      el.innerHTML = `<span style="color:#38bdf8; font-weight:bold;">@${user}</span>: <span style="color:#cbd5e1;">${msg}</span>`;
-      feed.prepend(el);
-      while (feed.children.length > 20) feed.removeChild(feed.lastChild);
-    }
-
-    /* DevEx Cashout (Drops Robux JPY rate) */
-    function triggerDevEx(creator, amount) {
-      const feed = document.getElementById('devex-feed');
-      const usd = Math.round(amount * 0.0035);
-      const drop = +((amount / 500000) * 0.12).toFixed(2);
-      state.robuxJpyRate = Math.max(0.4, +(state.robuxJpyRate - drop).toFixed(2));
-
-      const el = document.createElement('div');
-      el.className = 'stream-card';
-      el.style.borderColor = 'rgba(244,63,94,0.4)';
-      el.innerHTML = `
-        <div>
-          <b style="color:#f43f5e;">${creator}</b>
-          <div style="color:#94a3b8;">R$ ${amount.toLocaleString()} 換金</div>
-        </div>
-        <div style="text-align:right;">
-          <span style="color:#10b981; font-weight:bold;">+$${usd.toLocaleString()}</span>
-          <div style="color:#f43f5e; font-size:9px;">為替 -¥${drop.toFixed(2)}</div>
-        </div>
-      `;
-      feed.prepend(el);
-      while (feed.children.length > 15) feed.removeChild(feed.lastChild);
-      pushForum(creator, `開発収益 R$ ${amount.toLocaleString()} を米ドル現金化した！DevEx神！`);
-    }
-
-    /* Plus Subscription */
-    function triggerPlusSub() {
-      const feed = document.getElementById('plus-feed');
-      const user = PLAYERS[Math.floor(Math.random() * PLAYERS.length)] + "_" + Math.floor(Math.random() * 80 + 10);
-      const country = COUNTRIES[Math.floor(Math.random() * COUNTRIES.length)];
-      state.plusSubscribers++;
-      state.treasuryRobux += 450; // Bonus cash flow
-
-      const el = document.createElement('div');
-      el.className = 'stream-card';
-      el.style.borderColor = 'rgba(192,132,252,0.4)';
-      el.innerHTML = `
-        <div>
-          <b style="color:#c084fc;">👑 ${user}</b>
-          <span style="color:#94a3b8; font-size:9px; margin-left:4px;">${country}</span>
-        </div>
-        <div style="text-align:right;">
-          <span style="color:#c084fc; font-weight:bold;">$5.00/月</span>
-          <div style="color:#34d399; font-size:9px;">+R$ 450</div>
-        </div>
-      `;
-      feed.prepend(el);
-      while (feed.children.length > 15) feed.removeChild(feed.lastChild);
-    }
-
-    /* Pass Purchase */
-    function recordPurchase(game, passName, cost) {
-      const feed = document.getElementById('tx-feed');
-      const player = PLAYERS[Math.floor(Math.random() * PLAYERS.length)] + Math.floor(Math.random() * 900 + 100);
-      const jpy = Math.round(cost * state.robuxJpyRate);
-
-      const el = document.createElement('div');
-      el.className = 'stream-card';
-      el.innerHTML = `
-        <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-          <span style="color:#facc15; font-weight:bold;">R$</span> <b>${player}</b>
-          <div style="color:#94a3b8; font-size:9px;">${game.name}</div>
-        </div>
-        <div style="text-align:right; flex-shrink:0;">
-          <span style="color:#facc15; font-weight:bold;">+R$ ${cost}</span>
-          <div style="color:#f59e0b; font-size:9px;">≈ ¥${jpy}</div>
-        </div>
-      `;
-      feed.prepend(el);
-      while (feed.children.length > 20) feed.removeChild(feed.lastChild);
-
-      state.treasuryRobux += Math.max(1, Math.floor(cost * 0.30)); // 30% platform fee
-    }
-
-    function formatDate(d) {
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${y}/${m}/${day}`;
-    }
-
-    function tick() {
-      if (state.paused) return;
-
-      const advanceDays = Math.max(1, Math.round(state.speed * 3));
-      state.currentDate.setDate(state.currentDate.getDate() + advanceDays);
-      const currentYear = state.currentDate.getFullYear();
-
-      // Check Eras
-      HISTORIC_ERAS.forEach(era => {
-        if (currentYear >= era.year && !state.triggeredEras.has(era.year)) {
-          state.triggeredEras.add(era.year);
-          triggerEra(era);
-        }
-      });
-
-      // Stock Fluctuations
-      const fluctuate = (val, range) => +(val + (Math.random() - 0.49) * range).toFixed(2);
-      state.stocks.plddc = Math.max(20, fluctuate(state.stocks.plddc, 2.5));
-      state.stocks.dkk4 = Math.max(15, fluctuate(state.stocks.dkk4, 1.8));
-      state.stocks.mincrosft = Math.max(50, fluctuate(state.stocks.mincrosft, 3.2));
-
-      // Key Mechanic: Yoogle surges -> Robux JPY rate drops
-      let yoogleDelta = (Math.random() - 0.46) * 4.0;
-      if (currentYear >= 2026) yoogleDelta += 1.5;
-      state.stocks.yoogle = Math.max(40, +(state.stocks.yoogle + yoogleDelta).toFixed(2));
-      state.stocks.yoogleDiff = +yoogleDelta.toFixed(1);
-
-      if (yoogleDelta > 2.0) {
-        state.robuxJpyRate = Math.max(0.4, +(state.robuxJpyRate - 0.08).toFixed(2));
-      } else {
-        let fxDelta = (Math.random() - 0.49) * 0.06;
-        if (state.difficulty === 'nightmare') fxDelta -= 0.04;
-        state.robuxJpyRate = Math.max(0.4, +(state.robuxJpyRate + fxDelta).toFixed(2));
-      }
-
-      // Rival Rostem
-      let rostemDelta = (Math.random() - 0.48) * 1.5;
-      if (state.satisfaction < 60) rostemDelta += 3.5;
-      state.rostemValue = Math.max(5, Math.min(280, Math.round(state.rostemValue + rostemDelta)));
-
-      // Servers
-      state.servers.forEach(s => {
-        s.load = Math.max(10, Math.min(100, Math.round(s.load + (Math.random() - 0.48) * 6)));
-        s.ping = Math.max(15, Math.round(s.ping + (Math.random() - 0.5) * 4));
-        if (s.load > 88) {
-          s.status = "CRITICAL";
-          state.satisfaction = Math.max(20, state.satisfaction - 0.5);
-        } else if (s.load > 70) {
-          s.status = "HEAVY";
-        } else {
-          s.status = "ONLINE";
-        }
-      });
-
-      // Games simulation
-      let totalPlatformCcu = 0;
-      const isEasy = state.difficulty === 'easy';
-
-      state.games.forEach(g => {
-        g.progress += advanceDays * 1.8;
-        if (g.progress >= 100) {
-          g.progress = 0;
-          g.ccu += Math.floor(g.ccu * 0.35 + 25);
-          if (Math.random() < 0.35) {
-            pushForum(g.creator, `大型アップデート配信完了！新要素追加！`);
-          }
-          if (g.ccu > 80 && Math.random() < 0.3) {
-            triggerDevEx(g.creator, Math.floor(g.ccu * 1200 + Math.random() * 40000));
-          }
-        }
-
-        let delta = (Math.random() - 0.5) * (g.ccu * 0.06 + 8);
-        if (isEasy) delta = Math.abs(delta) * 1.6 + 25;
-        if (state.satisfaction < 50 && !isEasy) delta -= (g.ccu * 0.08);
-
-        const downServers = state.servers.filter(s => s.status === 'CRITICAL').length;
-        if (downServers > 0) delta -= (g.ccu * 0.05 * downServers);
-
-        g.ccu = Math.max(8, Math.floor((g.ccu + delta) * (state.satisfaction / 100)));
-        if (g.ccu > g.peakCcu) g.peakCcu = g.ccu;
-        totalPlatformCcu += g.ccu;
-
-        if (Math.random() < (g.ccu * 0.007) * (state.speed * 0.5)) {
-          recordPurchase(g, g.passName, g.currentPrice);
-        }
-      });
-
-      if (Math.random() < 0.35) triggerPlusSub();
-      state.totalVisits += Math.floor(totalPlatformCcu * 0.18 * advanceDays);
-
-      if (Math.random() < 0.12) {
-        pushNews(NEWS_POOL[Math.floor(Math.random() * NEWS_POOL.length)]);
-      }
-
-      const isCrashing = (totalPlatformCcu < 80) || (state.satisfaction < 50);
-
-      state.history.push({
-        timestamp: state.currentDate.getTime(),
-        dateStr: formatDate(state.currentDate),
-        ccu: totalPlatformCcu,
-        robuxJpy: state.robuxJpyRate,
-        rostemVal: state.rostemValue,
-        isCrashing: isCrashing
-      });
-      if (state.history.length > 2500) state.history.shift();
-
-      renderUI();
-      renderChart();
-      renderServers();
-    }
-
-    function triggerEra(era) {
-      document.getElementById('era-badge').innerText = era.badge;
-      document.getElementById('era-desc').innerText = era.lore;
-      document.getElementById('era-year').innerText = `${era.year} ERA`;
-      state.robuxJpyRate = era.fxJPY;
-      state.rostemValue += era.rostemGrowth;
-
-      if (era.isBad) {
-        notify(`⚠️ 危機発生：${era.badge}`, "error");
-        pushNews(`【激震】${era.lore}`);
-        if (state.difficulty !== 'easy') {
-          state.games.forEach(g => g.ccu = Math.floor(g.ccu * era.ccuMult));
-          state.satisfaction = Math.max(20, state.satisfaction - 30);
-        }
-      } else {
-        notify(`🌟 時代の転換点：${era.badge}`, "success");
-        pushNews(`【飛躍】${era.lore}`);
-        state.games.forEach(g => g.ccu = Math.floor(g.ccu * era.ccuMult));
-        state.satisfaction = Math.min(100, state.satisfaction + 20);
-      }
-    }
-
-    function renderChart() {
-      const canvas = document.getElementById('chart-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const rect = canvas.getBoundingClientRect();
-
-      if (canvas.width !== rect.width || canvas.height !== rect.height) {
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-      }
-
+    function drawChart() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       const w = canvas.width;
       const h = canvas.height;
-      ctx.clearRect(0, 0, w, h);
 
-      if (state.history.length < 2) return;
-
-      const latestTime = state.history[state.history.length - 1].timestamp;
       let data = state.history;
+      if (state.chartRange === '1y') data = data.slice(-36);
+      else if (state.chartRange === '3y') data = data.slice(-108);
 
-      if (state.chartRange === '1y') {
-        const oneYearAgo = latestTime - (365 * 24 * 60 * 60 * 1000);
-        data = state.history.filter(item => item.timestamp >= oneYearAgo);
-      } else if (state.chartRange === '3y') {
-        const threeYearsAgo = latestTime - (3 * 365 * 24 * 60 * 60 * 1000);
-        data = state.history.filter(item => item.timestamp >= threeYearsAgo);
-      }
-      if (data.length < 2) data = state.history;
+      if (data.length < 2) return;
 
-      // Grid
-      ctx.strokeStyle = "rgba(30, 41, 59, 0.6)";
-      ctx.lineWidth = 1;
-      for (let y = 0; y < h; y += h / 4) {
+      const maxCCU = Math.max(...data.map(d => d.ccu), 1000);
+      const maxRate = Math.max(...data.map(d => d.rate), 5.0);
+      const maxRostem = Math.max(...data.map(d => d.rostem), 50.0);
+
+      function plotLine(key, maxVal, color) {
         ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(w, y);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        data.forEach((pt, i) => {
+          const x = (i / (data.length - 1)) * w;
+          const y = h - (pt[key] / maxVal) * (h - 20) - 10;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
         ctx.stroke();
       }
 
-      const step = w / (data.length - 1);
-
-      // 1. Green line: Rival Rostem
-      const maxRostem = Math.max(...data.map(d => d.rostemVal), 100) * 1.1;
-      ctx.beginPath();
-      data.forEach((d, i) => {
-        const x = i * step;
-        const y = h - (d.rostemVal / maxRostem) * (h * 0.85) - 10;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
-      ctx.strokeStyle = "#10b981";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // 2. Yellow line: Robux JPY
-      const maxJpy = Math.max(...data.map(d => d.robuxJpy), 4.0) * 1.2;
-      ctx.beginPath();
-      data.forEach((d, i) => {
-        const x = i * step;
-        const y = h - (d.robuxJpy / maxJpy) * (h * 0.85) - 10;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
-      ctx.strokeStyle = "#facc15";
-      ctx.lineWidth = 2.2;
-      ctx.stroke();
-
-      // 3. Blue/Red line: CCU (Turns red when low/crashing)
-      const maxCcu = Math.max(...data.map(d => d.ccu), 150) * 1.15;
-      const latest = data[data.length - 1];
-      const isCcuLow = latest.ccu < 100 || latest.isCrashing;
-
-      ctx.beginPath();
-      data.forEach((d, i) => {
-        const x = i * step;
-        const y = h - (d.ccu / maxCcu) * (h * 0.85) - 10;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
-      ctx.strokeStyle = isCcuLow ? "#ef4444" : "#06b6d4";
-      ctx.lineWidth = 3;
-      ctx.stroke();
-
-      // Last dot
-      const lastX = (data.length - 1) * step;
-      const lastY = h - (latest.ccu / maxCcu) * (h * 0.85) - 10;
-      ctx.fillStyle = isCcuLow ? "#ef4444" : "#22d3ee";
-      ctx.beginPath();
-      ctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Tooltip Summary
-      document.getElementById('chart-tooltip').innerHTML = `
-        期間: <b>${data[0].dateStr}</b> 〜 <b>${latest.dateStr}</b> | 
-        同接: <b style="color:${isCcuLow ? '#f87171' : '#22d3ee'};">${latest.ccu.toLocaleString()} CCU</b> | 
-        為替: <b style="color:#facc15;">¥${latest.robuxJpy.toFixed(2)}</b> | 
-        Rostem: <b style="color:#34d399;">${latest.rostemVal}pt</b>
-      `;
+      // CCU (危機時は赤、通常時は青)
+      const isCrisis = state.ccu < state.peakCcu * 0.4 && state.ccu > 2000;
+      plotLine('ccu', maxCCU, isCrisis ? '#ef4444' : '#00d2ff');
+      // Robux為替 (黄)
+      plotLine('rate', maxRate, '#f59e0b');
+      // Rostem (緑)
+      plotLine('rostem', maxRostem, '#10b981');
     }
 
-    function renderServers() {
-      const el = document.getElementById('server-nodes');
-      el.innerHTML = state.servers.map(s => {
-        let badgeColor = "#10b981";
-        let barColor = "#10b981";
-        let statusText = "稼働中 (ONLINE)";
+    // メインループ (時間経過・年代イベント)
+    setInterval(() => {
+      // 10日ずつ進む
+      state.date.setDate(state.date.getDate() + 10);
+      const year = state.date.getFullYear();
+      document.getElementById("display-date").innerText = 
+        `${year}/${String(state.date.getMonth() + 1).padStart(2, '0')}/${String(state.date.getDate()).padStart(2, '0')}`;
 
-        if (s.status === "CRITICAL") {
-          badgeColor = "#ef4444";
-          barColor = "#ef4444";
-          statusText = "障害・鯖落ち (DOWN)";
-        } else if (s.status === "HEAVY") {
-          badgeColor = "#f59e0b";
-          barColor = "#f59e0b";
-          statusText = "過負荷 (HEAVY)";
-        }
+      // 年代別トレンド
+      let growthFactor = 1.01;
+      if (year === 2011) {
+        growthFactor = 1.08;
+        setNews("🔥 2011年大爆発！Lua物理エンジン刷新で世界中の子供たちが一斉プレイ開始！");
+      } else if (year === 2019) {
+        growthFactor = 0.94;
+        setNews("🗑️ 2019年ゴミアプデ炎上！UI改悪＆有名BGM削除でクリエイター暴動！");
+      } else if (year === 2021) {
+        growthFactor = 0.92;
+        setNews("🔨 2021年超巨大BANウェーブ発動！ボット業者とチーターを数千万アカウント粛清！");
+      } else if (year === 2026) {
+        growthFactor = 0.95;
+        setNews("⚖️ 2026年規制強化の嵐！EUおよび各国の未成年課金制限でRobux経済に激震！");
+      } else if (year >= 2030) {
+        growthFactor = 0.98;
+        setNews("⚠️ 2030年崩壊の始まり…？ 競合メタバース乱立で古参ユーザーの流出が加速！");
+      }
 
-        return `
-          <div class="server-node">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:11px; font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.name}</span>
-              <span style="font-size:9px; font-family:monospace; color:${badgeColor};">${statusText}</span>
+      // 同接・為替計算
+      state.ccu = Math.max(80, Math.floor(state.ccu * growthFactor + (Math.random() * 80 - 35)));
+      if (state.ccu > state.peakCcu) state.peakCcu = state.ccu;
+
+      // Yoogle連動
+      state.stocks.yoogle += (Math.random() * 6 - 2.8);
+      if (state.stocks.yoogle > 230) {
+        state.robuxRate = Math.max(0.4, state.robuxRate - 0.03); // Yoogle上昇でRobux下落
+      } else {
+        state.robuxRate = Math.max(0.4, Math.min(5.0, state.robuxRate + (Math.random() * 0.04 - 0.02)));
+      }
+
+      state.rostemVal = Math.max(5, state.rostemVal + (Math.random() * 1.5 - 0.6));
+
+      // 履歴保存
+      state.history.push({
+        ccu: state.ccu,
+        rate: state.robuxRate,
+        rostem: state.rostemVal
+      });
+      if (state.history.length > 500) state.history.shift();
+
+      // UI反映
+      document.getElementById("stat-ccu").innerText = state.ccu.toLocaleString();
+      document.getElementById("stat-peak").innerText = state.peakCcu.toLocaleString();
+      document.getElementById("stat-rate").innerText = `¥ ${state.robuxRate.toFixed(2)}`;
+      document.getElementById("stat-funds").innerText = `R$ ${Math.floor(state.robux).toLocaleString()}`;
+      document.getElementById("stat-jpy").innerText = `¥ ${Math.floor(state.robux * state.robuxRate).toLocaleString()}`;
+      document.getElementById("stat-rostem").innerText = `$ ${state.rostemVal.toFixed(1)}M`;
+
+      // 株価ティッカー更新
+      document.getElementById("ticker-yoogle").innerText = `$${state.stocks.yoogle.toFixed(2)}`;
+      document.getElementById("ticker-yoogle").className = state.stocks.yoogle > 220 ? "up" : "down";
+
+      drawChart();
+      updateServers();
+    }, 400);
+
+    // ニュース設定
+    function setNews(text) {
+      document.getElementById("news-text").innerText = text;
+    }
+
+    // チャート期間切り替え
+    function setChartRange(range) {
+      state.chartRange = range;
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      event.target.classList.add("active");
+      drawChart();
+    }
+
+    // DevEx 申請トリガー
+    setInterval(() => {
+      if (state.ccu < 500) return;
+      const creators = ["CoolDev99", "BloxMaster", "LuaNinja", "PixelQueen", "BuildGod"];
+      const creator = creators[Math.floor(Math.random() * creators.length)];
+      const amountR$ = Math.floor(Math.random() * 400000 + 100000);
+      const usd = (amountR$ * 0.0035).toFixed(0);
+
+      // Robuxレート暴落
+      state.robuxRate = Math.max(0.35, state.robuxRate - 0.04);
+
+      const feed = document.getElementById("devex-feed");
+      const item = document.createElement("div");
+      item.className = "feed-item";
+      item.innerHTML = `
+        <div><strong>${creator}</strong> がDevEx申請</div>
+        <div style="color:var(--accent-red); font-weight:bold;">-R$ ${amountR$.toLocaleString()} ($${usd})</div>
+      `;
+      feed.prepend(item);
+      if (feed.children.length > 20) feed.lastChild.remove();
+    }, 4500);
+
+    // Plusプラン & 課金ログ
+    setInterval(() => {
+      const users = ["RobloxFan", "Builder007", "GamerX", "NeonKnight", "TokyoKid"];
+      const u = users[Math.floor(Math.random() * users.length)] + Math.floor(Math.random()*900);
+      
+      const pFeed = document.getElementById("plus-feed");
+      const pItem = document.createElement("div");
+      pItem.className = "feed-item";
+      pItem.innerHTML = `<div>👑 <strong>${u}</strong> がPlus加入</div><div style="color:var(--accent-green); font-weight:bold;">+$5.00</div>`;
+      pFeed.prepend(pItem);
+      if (pFeed.children.length > 15) pFeed.lastChild.remove();
+
+      state.robux += 400;
+    }, 2800);
+
+    // サーバー更新
+    function updateServers() {
+      const grid = document.getElementById("server-grid");
+      grid.innerHTML = "";
+      state.servers.forEach(s => {
+        s.load = Math.min(100, Math.max(10, Math.floor(s.load + (Math.random() * 10 - 5))));
+        let badge = "status-ok";
+        let text = "正常稼働";
+        if (s.load > 70) { badge = "status-warn"; text = "高負荷"; }
+        if (s.load > 88) { badge = "status-crit"; text = "障害・鯖落ち寸前"; }
+
+        grid.innerHTML += `
+          <div class="server-card">
+            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:bold;">
+              <div><span class="server-status ${badge}"></span>${s.name}</div>
+              <div style="color:var(--text-sub);">${s.ping}ms</div>
             </div>
-            <div style="display:flex; justify-content:space-between; font-size:10px; font-family:monospace; color:#94a3b8; margin-top:6px;">
-              <span>Ping: ${s.ping}ms</span>
-              <span>負荷: ${s.load}%</span>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width: ${s.load}%;"></div>
             </div>
-            <div class="progress-track" style="margin-top:6px;">
-              <div class="progress-fill" style="width:${Math.min(100, s.load)}%; background:${barColor};"></div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:6px; color:var(--text-sub);">
+              <div>ステータス: ${text}</div>
+              <div>負荷: ${s.load}%</div>
             </div>
           </div>
         `;
-      }).join('');
+      });
     }
 
-    function renderUI() {
-      document.getElementById('date-display').innerText = formatDate(state.currentDate);
-
-      // Stocks
-      document.getElementById('stk-plddc').innerText = `$${state.stocks.plddc.toFixed(2)}`;
-      document.getElementById('stk-dkk4').innerText = `$${state.stocks.dkk4.toFixed(2)}`;
-      document.getElementById('stk-yoogle').innerText = `$${state.stocks.yoogle.toFixed(2)}`;
-      document.getElementById('stk-mincrosft').innerText = `$${state.stocks.mincrosft.toFixed(2)}`;
-
-      const yoogleDiff = document.getElementById('stk-yoogle-d');
-      if (state.stocks.yoogleDiff >= 0) {
-        yoogleDiff.innerText = `+${state.stocks.yoogleDiff}% ▲`;
-        yoogleDiff.style.color = '#34d399';
-      } else {
-        yoogleDiff.innerText = `${state.stocks.yoogleDiff}% ▼`;
-        yoogleDiff.style.color = '#f87171';
-      }
-
-      // KPIs
-      const totalCcu = state.games.reduce((acc, g) => acc + g.ccu, 0);
-      const peakTotal = Math.max(...state.history.map(h => h.ccu), totalCcu);
-      const isCrashing = totalCcu < 80 || state.satisfaction < 50;
-
-      const ccuEl = document.getElementById('kpi-ccu');
-      const ccuBadge = document.getElementById('ccu-badge');
-      const ccuHealth = document.getElementById('ccu-health-text');
-
-      ccuEl.innerText = totalCcu.toLocaleString();
-      if (isCrashing) {
-        ccuEl.className = "kpi-num rose";
-        ccuBadge.style.background = "rgba(239,68,68,0.2)";
-        ccuBadge.style.color = "#f87171";
-        ccuBadge.innerText = "過疎警報";
-        ccuHealth.style.color = "#f87171";
-        ccuHealth.innerText = "過疎・流出危機！";
-      } else {
-        ccuEl.className = "kpi-num cyan";
-        ccuBadge.style.background = "rgba(6,182,212,0.2)";
-        ccuBadge.style.color = "var(--cyan)";
-        ccuBadge.innerText = "LIVE";
-        ccuHealth.style.color = "var(--cyan)";
-        ccuHealth.innerText = "安定稼働中";
-      }
-
-      document.getElementById('kpi-peak-ccu').innerText = peakTotal.toLocaleString();
-      document.getElementById('kpi-visits').innerText = state.totalVisits.toLocaleString();
-      document.getElementById('robux-display').innerText = `R$ ${state.treasuryRobux.toLocaleString()}`;
-      document.getElementById('fx-display').innerText = `¥${state.robuxJpyRate.toFixed(2)}`;
-
-      const jpyVal = Math.round(state.treasuryRobux * state.robuxJpyRate);
-      document.getElementById('kpi-jpy-total').innerText = `¥${jpyVal.toLocaleString()}`;
-      document.getElementById('kpi-satisfaction').innerText = `${Math.round(state.satisfaction)}%`;
-      document.getElementById('kpi-rostem').innerText = `${state.rostemValue}pt`;
-      document.getElementById('kpi-plus-subs').innerText = `${state.plusSubscribers.toLocaleString()}人`;
-
-      const share = Math.round((totalCcu / (totalCcu + state.rostemValue * 3)) * 100);
-      document.getElementById('kpi-share').innerText = `Blox ${Math.max(5, Math.min(98, share))}%`;
-
-      const stars = document.getElementById('kpi-stars');
-      if (state.satisfaction >= 85) stars.innerText = "★★★★★";
-      else if (state.satisfaction >= 65) stars.innerText = "★★★★☆";
-      else if (state.satisfaction >= 45) stars.innerText = "★★★☆☆";
-      else stars.innerText = "★☆☆☆☆";
-
-      // Games List
-      const gamesWrap = document.getElementById('games-container');
-      gamesWrap.innerHTML = state.games.map(g => `
-        <div class="game-box">
-          <div class="game-meta">
-            <span style="background:#1e293b; color:#38bdf8; padding:2px 6px; border-radius:4px; font-weight:bold;">${g.genre}</span>
-            <span>開発: ${g.creator}</span>
-          </div>
-          <div class="game-title">${g.name}</div>
-          <div class="game-stats">
-            <span>同接: <b style="color:${g.ccu < 20 ? '#f87171' : '#38bdf8'}">${g.ccu.toLocaleString()}</b></span>
-            <span style="color:#34d399;">アプデ進捗: ${Math.round(g.progress)}%</span>
-          </div>
-          <div class="progress-track">
-            <div class="progress-fill" style="width:${Math.min(100, g.progress)}%;"></div>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:10px; color:#94a3b8; border-top:1px solid #1e293b; padding-top:6px;">
-            <span>パス: <b style="color:#facc15;">R$ ${g.currentPrice}</b> (¥${Math.round(g.currentPrice * state.robuxJpyRate)})</span>
-            <span style="color:#64748b;">${g.passName}</span>
-          </div>
-        </div>
-      `).join('');
+    // コマンド
+    function triggerDevExBoost() {
+      state.robuxRate += 0.25;
+      alert("DevEx引き換え枠を一時制限しました！Robux相場が安定します。");
     }
-
-    // Initialize
-    window.onload = function () {
-      openDiffModal();
-      setInterval(tick, 180);
-      window.addEventListener('resize', renderChart);
-    };
+    function togglePriceStrategy() {
+      state.robux += 25000;
+      alert("課金アイテムの価格を50%引き上げました！Robuxが大量に入金されます。");
+    }
+    function globalFestival() {
+      state.ccu = Math.floor(state.ccu * 1.4);
+      alert("全社フェスティバルを開催！世界中からプレイヤーが殺到しています！");
+    }
+    function rebootServers() {
+      state.servers.forEach(s => s.load = 25);
+      alert("世界中のデータセンターを一斉リブートしました！Pingと負荷率が改善しました。");
+    }
   </script>
 </body>
 </html>
