@@ -4,32 +4,343 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BloxCorp - メタバース運営シミュレーター</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --bg-main: #0b0f19;
+      --bg-card: rgba(18, 24, 38, 0.95);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --text-main: #f3f4f6;
+      --text-sub: #9ca3af;
+      --accent-blue: #00d2ff;
+      --accent-gold: #f59e0b;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-purple: #8b5cf6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      background-image: radial-gradient(circle at top right, rgba(0, 210, 255, 0.08), transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(139, 92, 246, 0.08), transparent 40%);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 50px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .ticker-bar {
+      background: #060911;
+      border-bottom: 1px solid var(--border-color);
+      font-family: monospace;
+      font-size: 11px;
+      padding: 8px 0;
+    }
+    .ticker-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .ticker-group {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .stock-item {
+      display: inline-flex;
+      gap: 4px;
+      font-weight: bold;
+    }
+    .up { color: var(--accent-green); }
+    .down { color: var(--accent-red); }
+
+    .news-bar {
+      background: rgba(239, 68, 68, 0.15);
+      border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 8px 0;
+      font-size: 12px;
+    }
+    .news-badge {
+      background: var(--accent-red);
+      color: #fff;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    header {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .logo-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #ff0055, #7928ca);
+      transform: rotate(-8deg);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(255, 0, 85, 0.4);
+    }
+    .logo-inner {
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      transform: rotate(8deg);
+      border-radius: 3px;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 800;
+    }
+    .date-badge {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 6px;
+      text-align: right;
+      font-family: monospace;
+    }
+    .date-badge .year {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--accent-blue);
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .stat-val {
+      font-size: 24px;
+      font-weight: 800;
+      margin-top: 4px;
+    }
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid transparent;
+      color: var(--text-sub);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: var(--accent-blue);
+      color: #000;
+      font-weight: bold;
+    }
+
+    .canvas-wrap {
+      width: 100%;
+      height: 240px;
+      position: relative;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 12px;
+      font-size: 11px;
+      margin-top: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .feed-box {
+      height: 240px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .feed-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .commands-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .cmd-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      padding: 10px 12px;
+      border-radius: 6px;
+      color: var(--text-main);
+      text-align: left;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .cmd-btn:hover {
+      background: rgba(0, 210, 255, 0.15);
+      border-color: var(--accent-blue);
+    }
+    .cmd-btn .name {
+      font-size: 13px;
+      font-weight: bold;
+    }
+    .cmd-btn .desc {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 3px;
+    }
+
+    .server-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .server-card {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 10px;
+      border-radius: 6px;
+    }
+    .server-status {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+    .status-ok { background: var(--accent-green); }
+    .status-warn { background: var(--accent-gold); }
+    .status-crit { background: var(--accent-red); }
+
+    .progress-bar-bg {
+      background: rgba(255, 255, 255, 0.1);
+      height: 5px;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent-blue);
+      transition: width 0.3s;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- 上部ティッカーバー (テック4社) -->
+  <!-- ティッカー -->
   <div class="ticker-bar">
     <div class="container ticker-content">
       <div class="ticker-group">
-        <span style="color: var(--text-sub);">NASDAQ GLOBAL:</span>
+        <span style="color: var(--text-sub);">NASDAQ:</span>
         <div class="stock-item">plddc <span id="ticker-plddc" class="up">$142.30</span></div>
         <div class="stock-item">DKK4 <span id="ticker-dkk4" class="up">$88.15</span></div>
         <div class="stock-item">Yoogle <span id="ticker-yoogle" class="down">$210.40</span></div>
         <div class="stock-item">mincrosft <span id="ticker-mincrosft" class="up">$380.00</span></div>
       </div>
       <div style="color: #f59e0b; font-size: 11px;">
-        ⚠️ Yoogle高騰時: Robux為替下落アラート連動中
+        ⚠️ Yoogle高騰でRobuxレート急落アラート連動中
       </div>
     </div>
   </div>
 
-  <!-- 速報ニュースバー -->
+  <!-- 速報バー -->
   <div class="news-bar">
     <div class="container" style="display:flex; align-items:center; gap:8px;">
       <span class="news-badge">BREAKING</span>
-      <span id="news-text" style="color:#e5e7eb; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-        2006年1月1日: ブロック型オンライン物理サンドボックス「BloxCorp」正式サービス開始！
+      <span id="news-text" style="color:#e5e7eb; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+        2006年1月1日: BloxCorp正式リリース！物理サンドボックスの歴史が幕を開ける
       </span>
     </div>
   </div>
@@ -39,12 +350,10 @@
     <header>
       <div class="header-row">
         <div class="logo-title">
-          <div class="logo-icon">
-            <div class="logo-inner"></div>
-          </div>
+          <div class="logo-icon"><div class="logo-inner"></div></div>
           <div>
             <h1>BloxCorp CEO Console</h1>
-            <div style="font-size:12px; color:var(--text-sub);">グローバル・プラットフォーム運営ダッシュボード</div>
+            <div style="font-size:12px; color:var(--text-sub);">プラットフォーム運営ダッシュボード</div>
           </div>
         </div>
         <div class="date-badge">
@@ -54,7 +363,7 @@
       </div>
     </header>
 
-    <!-- 主要指標グリッド -->
+    <!-- 指標グリッド -->
     <div class="stats-grid">
       <div class="card">
         <div class="card-title">👥 同時接続数 (CCU)</div>
@@ -64,76 +373,74 @@
       <div class="card">
         <div class="card-title">🪙 Robux為替レート</div>
         <div class="stat-val" id="stat-rate" style="color:var(--accent-gold);">¥ 1.50</div>
-        <div class="stat-sub">1 R$ あたりの日本円価値</div>
+        <div class="stat-sub">1 R$ あたりの日本円相場</div>
       </div>
       <div class="card">
         <div class="card-title">💰 プラットフォーム資金</div>
-        <div class="stat-val" id="stat-funds" style="color:var(--accent-green);">R$ 5,000</div>
-        <div class="stat-sub">約 <span id="stat-jpy">¥ 7,500</span></div>
+        <div class="stat-val" id="stat-funds" style="color:var(--accent-green);">R$ 50,000</div>
+        <div class="stat-sub">約 <span id="stat-jpy">¥ 75,000</span></div>
       </div>
       <div class="card">
         <div class="card-title">⚔️ 競合「Rostem」時価</div>
         <div class="stat-val" id="stat-rostem" style="color:#34d399;">$ 12.5M</div>
-        <div class="stat-sub">市場シェア侵食率: <span id="stat-share">4.2%</span></div>
+        <div class="stat-sub">市場シェア: <span id="stat-share">4.2%</span></div>
       </div>
     </div>
 
-    <!-- CEO アクションボタン -->
-    <div class="card" style="margin-bottom: 24px;">
+    <!-- CEO アクション -->
+    <div class="card">
       <div class="card-title">⚡ CEO戦略オペレーション</div>
       <div class="commands-grid" style="margin-top:10px;">
         <button class="cmd-btn" onclick="triggerDevExBoost()">
-          <div class="cmd-name">💸 DevEx換金レート引き締め</div>
-          <div class="cmd-desc">換金枠を絞りRobux流出と暴落を防ぐ</div>
+          <div class="name">💸 DevEx換金枠引き締め</div>
+          <div class="desc">換金を抑制しRobux相場の急落を防ぐ</div>
         </button>
         <button class="cmd-btn" onclick="togglePriceStrategy()">
-          <div class="cmd-name">🏷️ 課金アイテム50%値上げ</div>
-          <div class="cmd-desc">Robux回収率激増 (不満度微増)</div>
+          <div class="name">🏷️ 課金アイテム50%値上げ</div>
+          <div class="desc">Robux回収率急増 (不満度微増)</div>
         </button>
         <button class="cmd-btn" onclick="globalFestival()">
-          <div class="cmd-name">🎪 全社メタバースフェス開催</div>
-          <div class="cmd-desc">同時接続数を一気に引き上げる</div>
+          <div class="name">🎪 メタバースフェス開催</div>
+          <div class="desc">世界同時イベントで同接を急増させる</div>
         </button>
         <button class="cmd-btn" onclick="rebootServers()">
-          <div class="cmd-name">🔄 全地域サーバー一斉リブート</div>
-          <div class="cmd-desc">高負荷・Ping悪化を一瞬でリフレッシュ</div>
+          <div class="name">🔄 全サーバー一斉リブート</div>
+          <div class="desc">過負荷・Ping遅延を一括リセット</div>
         </button>
       </div>
     </div>
 
-    <!-- メインデータグラフ＆各種履歴フィード -->
+    <!-- グラフ＆DevEx -->
     <div class="main-grid">
-      <!-- チャート -->
       <div class="card">
         <div class="card-header">
           <div class="card-title">📈 グローバル推移チャート</div>
-          <div class="chart-controls">
-            <button class="tab-btn" onclick="setChartRange('1y')">1年</button>
-            <button class="tab-btn" onclick="setChartRange('3y')">3年</button>
-            <button class="tab-btn active" id="btn-all" onclick="setChartRange('all')">All</button>
+          <div>
+            <button class="tab-btn" onclick="setChartRange('1y', this)">1年</button>
+            <button class="tab-btn" onclick="setChartRange('3y', this)">3年</button>
+            <button class="tab-btn active" onclick="setChartRange('all', this)">All</button>
           </div>
         </div>
-        <div class="canvas-wrap">
+        <div class="canvas-wrap" id="canvas-container">
           <canvas id="mainChart"></canvas>
         </div>
         <div class="chart-legend">
-          <div class="legend-item"><span class="legend-dot" style="background:#00d2ff;"></span> 同接数 (青/危機時赤)</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#00d2ff;"></span> 同接数 (青/過疎時赤)</div>
           <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> Robux円相場 (黄)</div>
           <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> Rostem企業価値 (緑)</div>
         </div>
       </div>
 
-      <!-- DevEx引き換えフィード -->
       <div class="card">
         <div class="card-header">
-          <div class="card-title">📉 DevEx (開発者現金化) 申請所</div>
+          <div class="card-title">📉 DevEx 申請ログ</div>
           <span style="font-size:11px; color:var(--accent-red);">※換金でRobux下落</span>
         </div>
         <div class="feed-box" id="devex-feed"></div>
       </div>
     </div>
 
-    <!-- Plusプラン & リアルタイム課金履歴 -->
+    <!-- サブスク & 課金履歴 -->
     <div class="main-grid">
       <div class="card">
         <div class="card-header">
@@ -151,7 +458,7 @@
       </div>
     </div>
 
-    <!-- 世界サーバー網リアルタイムマップ -->
+    <!-- サーバーマップ -->
     <div class="card">
       <div class="card-header">
         <div class="card-title">🌐 世界BloxCorpデータセンター稼働状況</div>
@@ -161,40 +468,42 @@
     </div>
   </div>
 
-  <!-- ゲーム内ロジック -->
   <script>
-    // --- 状態管理 ---
     const state = {
       date: new Date(2006, 0, 1),
       ccu: 150,
       peakCcu: 150,
       robux: 50000,
-      robuxRate: 1.50, // 1 R$ = ¥1.50
+      robuxRate: 1.50,
       rostemVal: 12.5,
       chartRange: 'all',
       history: [],
       stocks: { plddc: 142.3, dkk4: 88.1, yoogle: 210.4, mincrosft: 380.0 },
       servers: [
-        { name: "US-East (バージニア)", ping: 24, load: 35, status: "ok" },
-        { name: "US-West (オレゴン)", ping: 38, load: 42, status: "ok" },
-        { name: "EU-Central (フランクフルト)", ping: 85, load: 50, status: "ok" },
-        { name: "Asia-East (東京)", ping: 15, load: 28, status: "ok" },
-        { name: "SA-East (サンパウロ)", ping: 140, load: 60, status: "ok" }
+        { name: "US-East (バージニア)", ping: 24, load: 35 },
+        { name: "US-West (オレゴン)", ping: 38, load: 42 },
+        { name: "EU-Central (フランクフルト)", ping: 85, load: 50 },
+        { name: "Asia-East (東京)", ping: 15, load: 28 },
+        { name: "SA-East (サンパウロ)", ping: 140, load: 60 }
       ]
     };
 
-    // チャート描画
     const canvas = document.getElementById("mainChart");
     const ctx = canvas.getContext("2d");
+    const container = document.getElementById("canvas-container");
 
     function resizeCanvas() {
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
+      if (!container) return;
+      canvas.width = container.clientWidth || 600;
+      canvas.height = container.clientHeight || 240;
     }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      drawChart();
+    });
 
     function drawChart() {
+      if (canvas.width === 0 || canvas.height === 0) resizeCanvas();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const w = canvas.width;
       const h = canvas.height;
@@ -215,64 +524,64 @@
         ctx.lineWidth = 2;
         data.forEach((pt, i) => {
           const x = (i / (data.length - 1)) * w;
-          const y = h - (pt[key] / maxVal) * (h - 20) - 10;
+          const y = h - (pt[key] / maxVal) * (h - 24) - 12;
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         });
         ctx.stroke();
       }
 
-      // CCU (危機時は赤、通常時は青)
       const isCrisis = state.ccu < state.peakCcu * 0.4 && state.ccu > 2000;
       plotLine('ccu', maxCCU, isCrisis ? '#ef4444' : '#00d2ff');
-      // Robux為替 (黄)
       plotLine('rate', maxRate, '#f59e0b');
-      // Rostem (緑)
       plotLine('rostem', maxRostem, '#10b981');
     }
 
-    // メインループ (時間経過・年代イベント)
+    // 初回実行
+    resizeCanvas();
+    for (let i = 0; i < 5; i++) {
+      state.history.push({ ccu: state.ccu, rate: state.robuxRate, rostem: state.rostemVal });
+    }
+    drawChart();
+
+    // メインシミュレーションループ
     setInterval(() => {
-      // 10日ずつ進む
       state.date.setDate(state.date.getDate() + 10);
       const year = state.date.getFullYear();
       document.getElementById("display-date").innerText = 
         `${year}/${String(state.date.getMonth() + 1).padStart(2, '0')}/${String(state.date.getDate()).padStart(2, '0')}`;
 
-      // 年代別トレンド
-      let growthFactor = 1.01;
+      let growth = 1.01;
       if (year === 2011) {
-        growthFactor = 1.08;
-        setNews("🔥 2011年大爆発！Lua物理エンジン刷新で世界中の子供たちが一斉プレイ開始！");
+        growth = 1.08;
+        setNews("🔥 2011年大ブーム！新物理エンジンとスクリプト対応で世界中からプレイヤー殺到！");
       } else if (year === 2019) {
-        growthFactor = 0.94;
-        setNews("🗑️ 2019年ゴミアプデ炎上！UI改悪＆有名BGM削除でクリエイター暴動！");
+        growth = 0.94;
+        setNews("🗑️ 2019年ゴミアプデ炎上！UI大幅改悪＆クラシックBGM削除でクリエイター抗議デモ！");
       } else if (year === 2021) {
-        growthFactor = 0.92;
-        setNews("🔨 2021年超巨大BANウェーブ発動！ボット業者とチーターを数千万アカウント粛清！");
+        growth = 0.92;
+        setNews("🔨 2021年超大型BANウェーブ！不正ボット業者とチーターを数千万垢一掃！");
       } else if (year === 2026) {
-        growthFactor = 0.95;
-        setNews("⚖️ 2026年規制強化の嵐！EUおよび各国の未成年課金制限でRobux経済に激震！");
+        growth = 0.95;
+        setNews("⚖️ 2026年規制強化の嵐！世界各国で未成年保護法が施行され課金に厳しい制約！");
       } else if (year >= 2030) {
-        growthFactor = 0.98;
-        setNews("⚠️ 2030年崩壊の始まり…？ 競合メタバース乱立で古参ユーザーの流出が加速！");
+        growth = 0.98;
+        setNews("⚠️ 2030年崩壊の予兆…？ 競合メタバースの台頭により古参クリエイターが離脱！");
       }
 
-      // 同接・為替計算
-      state.ccu = Math.max(80, Math.floor(state.ccu * growthFactor + (Math.random() * 80 - 35)));
+      state.ccu = Math.max(80, Math.floor(state.ccu * growth + (Math.random() * 80 - 35)));
       if (state.ccu > state.peakCcu) state.peakCcu = state.ccu;
 
       // Yoogle連動
       state.stocks.yoogle += (Math.random() * 6 - 2.8);
-      if (state.stocks.yoogle > 230) {
-        state.robuxRate = Math.max(0.4, state.robuxRate - 0.03); // Yoogle上昇でRobux下落
+      if (state.stocks.yoogle > 225) {
+        state.robuxRate = Math.max(0.4, state.robuxRate - 0.03);
       } else {
         state.robuxRate = Math.max(0.4, Math.min(5.0, state.robuxRate + (Math.random() * 0.04 - 0.02)));
       }
 
       state.rostemVal = Math.max(5, state.rostemVal + (Math.random() * 1.5 - 0.6));
 
-      // 履歴保存
       state.history.push({
         ccu: state.ccu,
         rate: state.robuxRate,
@@ -280,7 +589,6 @@
       });
       if (state.history.length > 500) state.history.shift();
 
-      // UI反映
       document.getElementById("stat-ccu").innerText = state.ccu.toLocaleString();
       document.getElementById("stat-peak").innerText = state.peakCcu.toLocaleString();
       document.getElementById("stat-rate").innerText = `¥ ${state.robuxRate.toFixed(2)}`;
@@ -288,76 +596,83 @@
       document.getElementById("stat-jpy").innerText = `¥ ${Math.floor(state.robux * state.robuxRate).toLocaleString()}`;
       document.getElementById("stat-rostem").innerText = `$ ${state.rostemVal.toFixed(1)}M`;
 
-      // 株価ティッカー更新
-      document.getElementById("ticker-yoogle").innerText = `$${state.stocks.yoogle.toFixed(2)}`;
-      document.getElementById("ticker-yoogle").className = state.stocks.yoogle > 220 ? "up" : "down";
+      const yg = document.getElementById("ticker-yoogle");
+      yg.innerText = `$${state.stocks.yoogle.toFixed(2)}`;
+      yg.className = state.stocks.yoogle > 220 ? "up" : "down";
 
       drawChart();
       updateServers();
     }, 400);
 
-    // ニュース設定
-    function setNews(text) {
-      document.getElementById("news-text").innerText = text;
+    function setNews(txt) {
+      const el = document.getElementById("news-text");
+      if (el) el.innerText = txt;
     }
 
-    // チャート期間切り替え
-    function setChartRange(range) {
-      state.chartRange = range;
+    function setChartRange(r, btn) {
+      state.chartRange = r;
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      event.target.classList.add("active");
+      if (btn) btn.classList.add("active");
       drawChart();
     }
 
-    // DevEx 申請トリガー
+    // DevEx ログ
     setInterval(() => {
-      if (state.ccu < 500) return;
-      const creators = ["CoolDev99", "BloxMaster", "LuaNinja", "PixelQueen", "BuildGod"];
-      const creator = creators[Math.floor(Math.random() * creators.length)];
-      const amountR$ = Math.floor(Math.random() * 400000 + 100000);
-      const usd = (amountR$ * 0.0035).toFixed(0);
+      if (state.ccu < 400) return;
+      const devs = ["RoboDev", "BloxMaster", "LuaNinja", "PixelQueen", "BuildGod"];
+      const d = devs[Math.floor(Math.random() * devs.length)];
+      const r = Math.floor(Math.random() * 300000 + 100000);
+      state.robuxRate = Math.max(0.35, state.robuxRate - 0.03);
 
-      // Robuxレート暴落
-      state.robuxRate = Math.max(0.35, state.robuxRate - 0.04);
-
-      const feed = document.getElementById("devex-feed");
-      const item = document.createElement("div");
-      item.className = "feed-item";
-      item.innerHTML = `
-        <div><strong>${creator}</strong> がDevEx申請</div>
-        <div style="color:var(--accent-red); font-weight:bold;">-R$ ${amountR$.toLocaleString()} ($${usd})</div>
-      `;
-      feed.prepend(item);
-      if (feed.children.length > 20) feed.lastChild.remove();
+      const f = document.getElementById("devex-feed");
+      const itm = document.createElement("div");
+      itm.className = "feed-item";
+      itm.innerHTML = `<div><strong>${d}</strong> がDevEx申請</div><div style="color:var(--accent-red);">-R$ ${r.toLocaleString()}</div>`;
+      f.prepend(itm);
+      if (f.children.length > 15) f.lastChild.remove();
     }, 4500);
 
-    // Plusプラン & 課金ログ
+    // Plus契約ログ
     setInterval(() => {
-      const users = ["RobloxFan", "Builder007", "GamerX", "NeonKnight", "TokyoKid"];
-      const u = users[Math.floor(Math.random() * users.length)] + Math.floor(Math.random()*900);
-      
-      const pFeed = document.getElementById("plus-feed");
-      const pItem = document.createElement("div");
-      pItem.className = "feed-item";
-      pItem.innerHTML = `<div>👑 <strong>${u}</strong> がPlus加入</div><div style="color:var(--accent-green); font-weight:bold;">+$5.00</div>`;
-      pFeed.prepend(pItem);
-      if (pFeed.children.length > 15) pFeed.lastChild.remove();
+      const u = "User" + Math.floor(Math.random() * 9000);
+      const f = document.getElementById("plus-feed");
+      const itm = document.createElement("div");
+      itm.className = "feed-item";
+      itm.innerHTML = `<div>👑 <strong>${u}</strong> がPlus加入</div><div style="color:var(--accent-green);">+$5.00</div>`;
+      f.prepend(itm);
+      if (f.children.length > 15) f.lastChild.remove();
+      state.robux += 350;
+    }, 3000);
 
-      state.robux += 400;
-    }, 2800);
+    // 通常課金ログ
+    setInterval(() => {
+      const items = ["スピードコイル", "VIPパス", "限定ペット卵", "ネオンウイング"];
+      const item = items[Math.floor(Math.random() * items.length)];
+      const u = "Player" + Math.floor(Math.random() * 900);
+      const r = Math.floor(Math.random() * 800 + 100);
+
+      const f = document.getElementById("trans-feed");
+      const itm = document.createElement("div");
+      itm.className = "feed-item";
+      itm.innerHTML = `<div>🛍️ <strong>${u}</strong> が購入: ${item}</div><div style="color:var(--accent-gold);">+R$ ${r}</div>`;
+      f.prepend(itm);
+      if (f.children.length > 15) f.lastChild.remove();
+      state.robux += r;
+    }, 1800);
 
     // サーバー更新
     function updateServers() {
-      const grid = document.getElementById("server-grid");
-      grid.innerHTML = "";
+      const g = document.getElementById("server-grid");
+      if (!g) return;
+      g.innerHTML = "";
       state.servers.forEach(s => {
-        s.load = Math.min(100, Math.max(10, Math.floor(s.load + (Math.random() * 10 - 5))));
+        s.load = Math.min(100, Math.max(10, Math.floor(s.load + (Math.random() * 8 - 4))));
         let badge = "status-ok";
-        let text = "正常稼働";
-        if (s.load > 70) { badge = "status-warn"; text = "高負荷"; }
-        if (s.load > 88) { badge = "status-crit"; text = "障害・鯖落ち寸前"; }
+        let statusText = "正常";
+        if (s.load > 70) { badge = "status-warn"; statusText = "高負荷"; }
+        if (s.load > 88) { badge = "status-crit"; statusText = "障害寸前"; }
 
-        grid.innerHTML += `
+        g.innerHTML += `
           <div class="server-card">
             <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:bold;">
               <div><span class="server-status ${badge}"></span>${s.name}</div>
@@ -367,7 +682,7 @@
               <div class="progress-bar-fill" style="width: ${s.load}%;"></div>
             </div>
             <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:6px; color:var(--text-sub);">
-              <div>ステータス: ${text}</div>
+              <div>状態: ${statusText}</div>
               <div>負荷: ${s.load}%</div>
             </div>
           </div>
@@ -375,22 +690,22 @@
       });
     }
 
-    // コマンド
+    // ボタン関数
     function triggerDevExBoost() {
-      state.robuxRate += 0.25;
-      alert("DevEx引き換え枠を一時制限しました！Robux相場が安定します。");
+      state.robuxRate += 0.2;
+      alert("DevEx引き換え枠を一時制限！Robux相場が持ち直しました。");
     }
     function togglePriceStrategy() {
-      state.robux += 25000;
-      alert("課金アイテムの価格を50%引き上げました！Robuxが大量に入金されます。");
+      state.robux += 20000;
+      alert("ゲームパスを50%値上げ！Robuxが大量に入金されました。");
     }
     function globalFestival() {
-      state.ccu = Math.floor(state.ccu * 1.4);
-      alert("全社フェスティバルを開催！世界中からプレイヤーが殺到しています！");
+      state.ccu = Math.floor(state.ccu * 1.35);
+      alert("全社メタバースフェス開催！同時接続数が急増中！");
     }
     function rebootServers() {
-      state.servers.forEach(s => s.load = 25);
-      alert("世界中のデータセンターを一斉リブートしました！Pingと負荷率が改善しました。");
+      state.servers.forEach(s => s.load = 20);
+      alert("全世界のデータセンターをリブートしました！負荷がリセットされました。");
     }
   </script>
 </body>
